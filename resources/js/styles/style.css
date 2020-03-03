@@ -1,0 +1,155 @@
+input,button,textarea{
+    font-family: 'Roboto';outline:none;
+}
+
+.block_info{width:700px;position:absolute;top:36px;right:0;background:#f9f6ff;border-left:1px solid #ddd;border-bottom:1px solid #ddd;}
+
+.tab_list{display:block;position:relative;overflow:hidden;padding:10px;border-bottom:1px solid #ddd;}
+.tab_list>div{float:left;margin-right: 10px;color:#085cb7;cursor:pointer;}
+.tab_list>div.active{font-weight: 500;color:#000;cursor:auto;}
+.tab_blocks{padding:6px 10px;display:flex;justify-content: space-between;border-bottom:1px solid #ddd;margin-bottom:10px;}
+.tab_blocks_header{position:relative;overflow:hidden;}
+.tab_blocks_header>div{font-size:13px;padding: 5px 8px;float:left;margin-right:5px;cursor:pointer;}
+.tab_blocks_header>div.active{background:#e1e1e1;cursor:auto;}
+.btn{background:#f8e9b9;padding:3px 8px;color:#000;font-size:13px;
+    border-radius:2px;border:1px solid #ddd;
+}
+.btn ._red{color:red;}
+
+.itm_row{display: flex;justify-content: space-between;flex-wrap:wrap;}
+.column{width:33%;}
+.column2{width:65.5%;}
+
+.itm_col{display: flex;justify-content: space-between;flex-wrap:wrap;}
+.wrp_itm_input{position:relative;width:100%;margin-bottom:12px;}
+.wrp_itm_input._half{width:48.8%;}
+
+.itm_input{box-sizing: border-box;width:100%;
+    padding-left:10px;padding-right:10px;
+    height:30px;border:1px solid #ddd;background:#fff;
+    outline:none;
+}
+.itm_textarea{
+    box-sizing: border-box;width:100%;
+    padding-left:10px;padding-right:10px;
+    border:1px solid #ddd;background:#fff;
+    outline:none;
+}
+
+.itm_photo{background: #fff;width: 100%;margin-bottom: 12px;border: 1px solid #ddd;}
+
+
+.frm_row{display:flex;justify-content: space-between;}
+.col{width:32%;}
+.col2{width:66%;}
+.col3{width:100%;}
+
+.itm_caption{color: #a8a8a8;position: absolute;font-size: 11px;top: -8px;left: 7px;z-index: 2;background: #fff;padding: 2px 4px 0;border-radius: 2px;line-height: 14px;height: 12px;}
+.tab_block{padding:10px 10px 0px 10px;}
+.line{border-bottom:1px solid #ddd;}
+
+header{padding:10px;border-bottom:1px solid #ddd;}
+.navbar ul{display:flex;list-style: none;padding:0;margin:0;}
+.navbar ul li{margin-right:10px;}
+.navbar ul li a{color:#000;text-decoration: none;display:block;;}
+.navbar ul li a.active{font-weight:500;}
+
+.wrapper{display:flex;flex-direction: column;justify-content: stretch;height:100%;}
+.wrapper_content{height:100%;overflow:auto;position:relative;}
+
+.properties_left{width:200px;border-right:1px solid #ddd;border-bottom:1px solid #ddd;}
+.properties_content{position: absolute;left: 200px;right: 0;top: 10px;bottom: 0;}
+.wrapper_content_info{display: flex;height:100%;}
+.profile_info_wrapper{position: absolute;
+    top: 25px;
+    left:15px;
+    right:0;
+    bottom: 60px;
+    overflow: auto;
+    }
+.dictonary_outer{position:absolute;top:0;left:0;right:0;bottom:0;}
+
+.properties_item{line-height:30px;padding-left:10px;padding-right:10px;}
+.properties_subitem{line-height:30px;padding-left:20px;padding-right:10px;}
+.properties_item._caption{background:#e1e1e1;}
+
+.dictonary_caption{font-size:16px;font-weight: 500;padding-left:15px;}
+.property_item_row{position:relative;display:flex;margin-top: 5px;margin-bottom: 5px;}
+.property_item{width:300px;padding-left:5px;padding-right:5px;line-height: 26px;outline:none;border:1px solid #ddd;padding-top:0;padding-bottom:0;}
+
+.del_dictionary_itm_val{line-height: 24px;padding-left: 10px;font-size: 12px;color: #085cb7;cursor:pointer;}
+.dictonary_buttons{height:60px;position:absolute;bottom:0;width:100%;left:0;border-top:1px solid #ddd;
+}
+.dictonary_buttons_info{padding-left:15px;padding-right:15px;display:flex;justify-content: space-between;    height: 100%;align-items: center;}
+
+.button{text-align:center;border:1px solid #ddd;
+    line-height:30px;height:30px;cursor:pointer;
+}
+.button._ok{background:#f8e9b9;}
+
+
+.button1{width:34%;}
+.button2{width:64%;}
+
+.wrp_finder{display:flex;border-bottom:1px solid #ddd;padding:10px;}
+.wrp_finder .btn{line-height: 20px;}
+.filter_caption{margin-left:10px;line-height:24px;}
+.finder_input{border:1px solid #ddd;border-left:0;padding-top:0;padding-bottom:0;padding-left:5px;padding-right:5px;height:26px;}
+
+
+
+/*Кастомизация таблицы */
+.dx-g-bs4-table{width:100%;border-collapse: collapse;
+    table-layout: fixed;
+    border-spacing: 0;
+    margin: 0;}
+.dx-g-bs4-table thead tr:first-child th{border-bottom:1px solid #ddd;font-weight: 500;}
+.dx-g-bs4-table thead tr td{font-weight:500;}
+
+.dx-g-bs4-table .dx-g-bs4-table-cell{border-bottom:1px solid #ddd;vertical-align: middle;font-size:13px;
+white-space: nowrap;overflow:hidden;text-overflow: ellipsis;padding: 6px 10px;font-size: 11px;}
+
+.bs4-header-cell{white-space: nowrap;overflow:hidden;text-overflow: ellipsis;}
+.dx-g-bs4-header-cell{position:relative;}
+.dx-g-bs4-resizing-control-wrapper {
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: "none";
+    position: absolute;
+    width: 16px;
+    top: 0;
+    right: -8px;
+    height: 100%;
+    cursor: col-resize;
+    z-index: 100;
+    opacity: 1;
+}
+.dx-g-bs4-resize-control-line{position: absolute;background-color: rgb(221, 221, 221);height: 50%;width: 1px;top: 25%;}
+.dx-g-bs4-resize-control-line-first{left: 7px;}
+.dx-g-bs4-resize-control-line-second{left: 9px;}
+.dx-g-bs4-resizing-control-wrapper:hover .dx-g-bs4-resize-control-line{background-color:#085cb7;}
+.dx-g-bs4-resize-control-line-active{background-color:#085cb7;}
+
+.dx-g-bs4-header-cell-content{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-left: 10px;
+    padding-right: 10px;
+    line-height: 24px;
+    font-size:13px;
+}
+
+.dx-g-bs4-table tr:hover td{background: #d9ebf5;}
+.dx-g-bs4-table tr td.text-center{text-align:center;}
+/*.dx-g-bs4-table .dx-g-bs4-table-invisible-row{display:none;}*/
+.dx-g-bs4-table tr.dx-g-bs4-table-invisible-row td{border:0;padding:0;}
+
+.dx-g-bs4-table tr td{
+    border-left: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+.dx-g-bs4-table>tbody>tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
