@@ -11,42 +11,23 @@ import {
 } //from '@devexpress/dx-react-grid-bootstrap3';
 from '@devexpress/dx-react-grid-bootstrap4';
 
-const URL = '/api/customers/';
 
 export default (m_props) => {
-  //console.log(props)
-  //props.showProfile(1)
-  //const rowClick = (val) =>{
-    //console.log(val)
-  //}
+  const URL = m_props.url;
   const rowClick = props => {
     const { value } = props;
     return (
-      <Table.Cell {...props} onClick={() => //console.log(m_props)
+      <Table.Cell {...props} onClick={() =>
         m_props.clickData(props.row.id)
       } />
     );
   };
 
-  const [columns] = useState([
-    { name: 'id', title: 'ID' },
-    { name: 'name', title: 'Имя' },
-    { name: 'phone', title: 'Телефон' },
-    { name: 'dob', title: 'Дата рождения' },
-  ]);
+  const [columns] = useState(m_props.columns);
+  const [tableColumnExtensions] = useState(m_props.columnExt);
+
   const [rows, setRows] = useState([]); 
-  const [tableColumnExtensions] = useState([
-    { columnName: 'id', align: 'left',width:100},
-    { columnName: 'name', align: 'left',width:100},
-    { columnName: 'phone', align: 'left',width:100},
-    { columnName: 'dob', align: 'left',width:100},
-  ]);
-  const [defaultColumnWidths] = useState([
-    { columnName: 'id', width:50 },
-    { columnName: 'name',width:100 },
-    { columnName: 'phone',width:100 },
-    { columnName: 'dob',width:100 },
-  ]);
+  const [defaultColumnWidths] = useState(m_props.columnWidth);
 
   //const [sorting, setSorting] = useState([{ columnName: 'name', direction: 'asc' }]);
   const [sorting, getSorting] = useState([]);
@@ -67,7 +48,7 @@ export default (m_props) => {
   };
 
   const getQueryString = () => {
-    let queryString = `${URL}`;
+    let queryString = `${URL}`+m_props.customerID;
 
     if (sorting.length) {
       const sortingConfig = sorting
@@ -117,7 +98,7 @@ export default (m_props) => {
         
         <TableSelection showSelectAll rowComponent={rowClick}/>
         <TableColumnReordering
-          defaultOrder={['id','name', 'phone', 'dob']}
+          defaultOrder={['date','record', 'base']}
          
         />
 

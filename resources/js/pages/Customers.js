@@ -15,7 +15,7 @@ class Customers extends Component {
         //Initialize the state in the constructor
         this.state = {
             stateActive:0,
-            customerID:0,
+            //customerID:0,
             stateSelected:{
                 stateActiveProfile:1,
                 stateActiveOrganization:1,
@@ -25,8 +25,6 @@ class Customers extends Component {
         this.updateData = this.updateData.bind(this)
         this.escFunction = this.escFunction.bind(this)
         this.showProfile = this.showProfile.bind(this)
-        
-
     }
     componentDidMount() {
         /* fetch API in action */

@@ -20,12 +20,12 @@ class CreateCustomersTable extends Migration
             $table->string('name');
             $table->string('patronymic');
             $table->string('photo');
-            $table->date('dob');
-
-            $table->integer('martial_id')->unsigned();
+            $table->date('dob')->nullable();
+            
+            $table->bigInteger('martial_id')->unsigned()->nullable();
             $table->foreign('martial_id')->references('id')->on('property_martials');
 
-            $table->integer('gender_id')->unsigned();
+            $table->bigInteger('gender_id')->unsigned()->nullable();
             $table->foreign('gender_id')->references('id')->on('property_genders');
 
             
@@ -38,7 +38,7 @@ class CreateCustomersTable extends Migration
 
             $table->string('passport_number');
             $table->string('passport_issuedby');
-            $table->date('passport_date');
+            $table->date('passport_date')->nullable();;
 
             $table->string('bpl');
 
@@ -46,17 +46,17 @@ class CreateCustomersTable extends Migration
             $table->string('insurance_number');
             $table->string('medical_number');
 
-            $table->integer('education_id')->unsigned();
+            $table->bigInteger('education_id')->unsigned()->nullable();
             $table->foreign('education_id')->references('id')->on('property_educations');
             $table->string('education_name');
             $table->string('education_speciality');
 
-            $table->integer('status_id')->unsigned();
+            $table->bigInteger('status_id')->unsigned()->nullable();
             $table->foreign('status_id')->references('id')->on('property_statuses');
             $table->string('military_number');
             $table->string('military_place');
 
-            $table->integer('criminal_id')->unsigned();
+            $table->bigInteger('criminal_id')->unsigned()->nullable();
             $table->foreign('criminal_id')->references('id')->on('property_criminals');
             $table->string('criminal_desc');
 

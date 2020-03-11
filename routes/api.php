@@ -42,3 +42,17 @@ Route::get('property_martial', 'PropertyMartialController@index');
 Route::get('property_gender', 'PropertyGenderController@index');
 
 //Route::get('customers', 'ProductsController@index');
+
+//Записи в трудовой книжке
+//Route::get('customer_history', 'CustomerHistoryController@index');
+//Route::get('customer_history/{customer_id}', 'CustomerHistoryController@show');
+//Route::get('customer_history/{customer_id}','CustomerHistoryController@show')->where('customer_id', '[0-9]+');
+Route::get('customer_history/{customer_id}', 'CustomersController@history')->where('customer_id', '[0-9]+');
+
+Route::get('customer_property/{customer_id}', 'CustomersController@property')->where('customer_id', '[0-9]+');
+Route::get('customer_kredit/{customer_id}', 'CustomersController@kredit')->where('customer_id', '[0-9]+');
+Route::get('customer_medical/{customer_id}', 'CustomersController@medical')->where('customer_id', '[0-9]+');
+
+
+//Route::put('customer_history/{customer}','CustomerHistoryController@update');
+//Route::delete('customer_history/{customer}', 'CustomerHistoryController@delete');

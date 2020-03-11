@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Customer;
+use App\History;
+use App\Property;
+use App\Kredit;
+use App\Medical;
+
 class CustomersController extends Controller
 {
     public function index()
@@ -13,6 +18,7 @@ class CustomersController extends Controller
  
     public function show(Customer $customer)
     {
+        
         return $customer;
     }
  
@@ -36,4 +42,23 @@ class CustomersController extends Controller
  
         return response()->json(null, 204);
     }
+    
+    public function history($customer_id){
+        $history = History::where('customer_id','=',$customer_id)->get();
+        return $history;
+    }
+    public function property($customer_id){
+        $property = Property::where('customer_id','=',$customer_id)->get();
+        return $property;
+    }
+    public function kredit($customer_id){
+        $kredit = Kredit::where('customer_id','=',$customer_id)->get();
+        return $kredit;
+    }
+    public function medical($customer_id){
+        $medical = Medical::where('customer_id','=',$customer_id)->get();
+        return $medical;
+    }
+    
+
 }

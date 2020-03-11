@@ -19,8 +19,8 @@ class Profile extends Component {
         this.props.updateData(stateActive,'stateActiveProfile')
     }
     componentDidMount(){
-        console.log(this.props.selected)
-        console.log(this.props.customerID)
+        //console.log(this.props.selected)
+        //console.log(this.props.customerID)
     }
     render() { 
         return (
@@ -36,10 +36,10 @@ class Profile extends Component {
                     <div className="btn">Печать</div>
                 </div>
                 {this.props.selected==1? <Profile_base customerID={this.props.customerID} />:''}
-                {this.props.selected==2? <Profile_history />:''}
-                {this.props.selected==3? <Profile_property/>:''}
-                {this.props.selected==4? <Profile_credits/>:''}
-                {this.props.selected==5? <Profile_med/>:''}
+                {this.props.selected==2? <Profile_history customerID={this.props.customerID}/>:''}
+                {this.props.selected==3? <Profile_property customerID={this.props.customerID}/>:''}
+                {this.props.selected==4? <Profile_credits customerID={this.props.customerID}/>:''}
+                {this.props.selected==5? <Profile_med customerID={this.props.customerID}/>:''}
                 
             </div>
         )

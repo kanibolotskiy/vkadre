@@ -30,6 +30,7 @@ class ComposerStaticInit10f4a6ac651d653d748049099d78f791
         'T' => 
         array (
             'TijsVerkoyen\\CssToInlineStyles\\' => 31,
+            'Tests\\' => 6,
         ),
         'S' => 
         array (
@@ -125,6 +126,10 @@ class ComposerStaticInit10f4a6ac651d653d748049099d78f791
         'TijsVerkoyen\\CssToInlineStyles\\' => 
         array (
             0 => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src',
+        ),
+        'Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/tests',
         ),
         'Symfony\\Polyfill\\Php73\\' => 
         array (
@@ -312,6 +317,7 @@ class ComposerStaticInit10f4a6ac651d653d748049099d78f791
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Customer' => __DIR__ . '/../..' . '/app/Customer.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
+        'App\\History' => __DIR__ . '/../..' . '/app/History.php',
         'App\\Http\\Controllers\\Auth\\ConfirmPasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/ConfirmPasswordController.php',
         'App\\Http\\Controllers\\Auth\\ForgotPasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/ForgotPasswordController.php',
         'App\\Http\\Controllers\\Auth\\LoginController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/LoginController.php',
@@ -331,12 +337,18 @@ class ComposerStaticInit10f4a6ac651d653d748049099d78f791
         'App\\Http\\Middleware\\TrimStrings' => __DIR__ . '/../..' . '/app/Http/Middleware/TrimStrings.php',
         'App\\Http\\Middleware\\TrustProxies' => __DIR__ . '/../..' . '/app/Http/Middleware/TrustProxies.php',
         'App\\Http\\Middleware\\VerifyCsrfToken' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyCsrfToken.php',
+        'App\\Kredit' => __DIR__ . '/../..' . '/app/Kredit.php',
+        'App\\Medical' => __DIR__ . '/../..' . '/app/Medical.php',
         'App\\Product' => __DIR__ . '/../..' . '/app/Product.php',
+        'App\\Property' => __DIR__ . '/../..' . '/app/Property.php',
         'App\\Property_criminal' => __DIR__ . '/../..' . '/app/Property_criminal.php',
         'App\\Property_education' => __DIR__ . '/../..' . '/app/Property_education.php',
         'App\\Property_gender' => __DIR__ . '/../..' . '/app/Property_gender.php',
         'App\\Property_martial' => __DIR__ . '/../..' . '/app/Property_martial.php',
         'App\\Property_status' => __DIR__ . '/../..' . '/app/Property_status.php',
+        'App\\Property_typecredit' => __DIR__ . '/../..' . '/app/Property_typecredit.php',
+        'App\\Property_typekredit' => __DIR__ . '/../..' . '/app/Property_typekredit.php',
+        'App\\Property_typeproperty' => __DIR__ . '/../..' . '/app/Property_typeproperty.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\AuthServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AuthServiceProvider.php',
         'App\\Providers\\BroadcastServiceProvider' => __DIR__ . '/../..' . '/app/Providers/BroadcastServiceProvider.php',
@@ -2808,6 +2820,10 @@ class ComposerStaticInit10f4a6ac651d653d748049099d78f791
         'Symfony\\Polyfill\\Mbstring\\Mbstring' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/Mbstring.php',
         'Symfony\\Polyfill\\Php72\\Php72' => __DIR__ . '/..' . '/symfony/polyfill-php72/Php72.php',
         'Symfony\\Polyfill\\Php73\\Php73' => __DIR__ . '/..' . '/symfony/polyfill-php73/Php73.php',
+        'Tests\\CreatesApplication' => __DIR__ . '/../..' . '/tests/CreatesApplication.php',
+        'Tests\\Feature\\ExampleTest' => __DIR__ . '/../..' . '/tests/Feature/ExampleTest.php',
+        'Tests\\TestCase' => __DIR__ . '/../..' . '/tests/TestCase.php',
+        'Tests\\Unit\\ExampleTest' => __DIR__ . '/../..' . '/tests/Unit/ExampleTest.php',
         'TijsVerkoyen\\CssToInlineStyles\\CssToInlineStyles' => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src/CssToInlineStyles.php',
         'TijsVerkoyen\\CssToInlineStyles\\Css\\Processor' => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src/Css/Processor.php',
         'TijsVerkoyen\\CssToInlineStyles\\Css\\Property\\Processor' => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src/Css/Property/Processor.php',
