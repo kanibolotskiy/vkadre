@@ -12,6 +12,7 @@ class Organization_base extends Component {
     render() { 
         return (
             <div className="profile_info">
+                {this.props.customerID}
                 <div className="tab_block">
                     <div className="frm_row">
                         <div className="col">
