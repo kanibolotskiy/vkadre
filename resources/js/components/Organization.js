@@ -67,8 +67,8 @@ class Organization extends Component {
                     params:{
                         captionAdd:'Добавление отпуска',
                         captionEdit:'Редактирование отпуска',
-                        captionAddButton:'Добавить отпуск',
-                        captionEditButton:'Изменить отпуск',
+                        captionAddButton:'Добавить запись',
+                        captionEditButton:'Изменить запись',
                     }
                 },
                 {
