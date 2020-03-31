@@ -7,7 +7,8 @@ import {
   Grid,
   Table, TableHeaderRow, TableEditRow, TableEditColumn,
   PagingPanel, DragDropProvider, TableColumnReordering,
-  TableFixedColumns, TableSummaryRow,TableColumnResizing,TableSelection 
+  TableFixedColumns, TableSummaryRow,TableColumnResizing,TableSelection,
+  ColumnChooser,TableColumnVisibility,Toolbar,
 } //from '@devexpress/dx-react-grid-bootstrap3';
 from '@devexpress/dx-react-grid-bootstrap4';
 import Loading from '../elements/Loading.js'
@@ -15,6 +16,7 @@ import Loading from '../elements/Loading.js'
 export default (m_props) => {
   const URL = m_props.url;
   const URL_widths = m_props.url+"_width"
+  const URL_orders = m_props.url+"_order"
 
  const rowClick = props => {
   const { value } = props;
@@ -27,15 +29,17 @@ export default (m_props) => {
   );
 };
 
-
   const [columns] = useState([
     { name: 'id', title: 'ID', width:30 },
     { name: 'name', title: 'Имя', width:100 },
     { name: 'dob', title: 'Дата рождения', width:100 },
     { name: 'martial', title: 'Семейное положение', width:100 },
     { name: 'gender', title: 'Пол', width:100 },
+    { name: 'mobphone', title: 'Мобильный телефон', width:100 },
+    { name: 'phone', title: 'Телефон', width:100 },
   ]);
 
+  const [defaultHiddenColumnNames] = useState(['gender', 'phone']);
   /**Форматирование колонок с датами */
   const [dateColumns] = useState([
     "dob"
@@ -63,25 +67,30 @@ export default (m_props) => {
   const [rows, setRows] = useState([]); 
   const [loading, setLoading] = useState(false);
 
-
+  /*
   const [tableColumnExtensions] = useState([
     { columnName: 'id', align: 'left',width:50},
     { columnName: 'name', align: 'left',width:100},
     { columnName: 'dob', align: 'left',width:100},
   ]);
+  */
   
 
   /*Ширина колонок*/
   const savedCoumnsWidth = () => {
-    let storageColumnsWidth=localStorage.getItem(URL_widths)
-    let column_width=[]    
-    if(storageColumnsWidth){
-      column_width=JSON.parse(storageColumnsWidth)
-    }else{
-      for(let itm in columns){
+    let column_width=[]
+    let stored_width=null
+    let stored_column_add=JSON.parse(localStorage.getItem(URL_widths))
+    let stored_column_width=stored_column_add?stored_column_add:[]
+    for(let itm in columns){
         let elem=columns[itm]
-        column_width.push({columnName:elem["name"],width:elem["width"]})
-      }
+        stored_width=stored_column_width.find(op => {
+          return op.columnName === elem.name
+        })
+        if(stored_width==undefined){
+          stored_width={columnName:elem["name"],width:elem["width"]}
+        }
+        column_width.push(stored_width)
     }
     return column_width
   }
@@ -90,6 +99,38 @@ export default (m_props) => {
     localStorage.setItem(URL_widths, JSON.stringify(value));
   } 
 
+  /*Порядок колонок */
+  const savedCoumnsOrder = () => {
+    /*
+    let column_order=[]
+    let stored_order=null
+    let stored_column_add=JSON.parse(localStorage.getItem(URL_orders))
+    let stored_column_order=stored_column_add?stored_column_add:[]
+    for(let itm in columns){
+        let elem=columns[itm]
+        stored_order=stored_column_order.find(op => {
+          return op.columnName === elem.name
+        })
+        if(stored_order==undefined){
+          stored_order=elem["name"]
+        }
+        column_order.push(stored_order)
+    }
+    console.log(column_order)
+    */
+    let column_order=[]
+    for(let itm in columns){
+      column_order.push(columns[itm]["name"])
+    }
+    
+    return column_order;
+  }
+  
+  const [columnsOrder,setColumnsOrder] = useState(savedCoumnsOrder);
+  const onChangeColumnOrder = (value) =>{
+    localStorage.setItem(URL_orders, JSON.stringify(value));
+  }
+  /*----------------*/
 
 
   //const [sorting, setSorting] = useState([{ columnName: 'name', direction: 'asc' }]);
@@ -155,14 +196,19 @@ export default (m_props) => {
         <SortingState defaultSorting={[{ columnName: 'id', direction: 'asc' }]} />
         <DragDropProvider />
         <IntegratedSelection />
-        <Table columnExtensions={tableColumnExtensions} rowComponent={rowClick}  messages={noDataMsg}/>
+        <Table  rowComponent={rowClick}  messages={noDataMsg}/>
         <TableColumnResizing defaultColumnWidths={defaultColumnWidths} onColumnWidthsChange={onChangeColumnWidth} />
         <IntegratedSorting />
         <TableHeaderRow showSortingControls/>
+        <TableColumnVisibility
+          defaultHiddenColumnNames={defaultHiddenColumnNames}
+        />
+        <Toolbar />
+        <ColumnChooser />
         <DateTypeProvider for={dateColumns}/>
         <CurrencyTypeProvider for={currencyColumns}/>
         <TableSelection showSelectAll rowComponent={rowClick}/>
-        <TableColumnReordering defaultOrder={['id','name', 'phone', 'dob']}/>
+        <TableColumnReordering defaultOrder={columnsOrder} onOrderChange={onChangeColumnOrder}/>
         {loading && <Loading />}
 
       </Grid>
@@ -171,6 +217,7 @@ export default (m_props) => {
 };
 
 /*
+columnExtensions={tableColumnExtensions}
   <SortingState
     sorting={sorting}
     onSortingChange={setSorting}

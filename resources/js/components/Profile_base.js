@@ -4,11 +4,17 @@ import Loader from './elements/Loader.js';
 //import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 import Highlighter from 'react-highlight-words';
+import Autosuggest from 'react-autosuggest';
+import PhoneInput from 'react-phone-input-2'
 
 import DatePicker, { registerLocale } from 'react-datepicker'
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru)
 
+// Imagine you have a list of languages that you'd like to autosuggest.
+const getSuggestionValue = (suggestion) => suggestion.name
+const renderSuggestion = (suggestion) => (<span>{suggestion.name}</span>)
+  
 function formatOptionLabel ({label}, {inputValue}) {
     return (
       <Highlighter
@@ -72,28 +78,60 @@ function formatOptionLabel ({label}, {inputValue}) {
   );
   
 class Profile_base extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         //Initialize the state in the constructor
         this.state = {
             loading:true,
             data:[],
             customerID:0,
-            address_reg_line:[]
+            //address_reg_line:[],
+            address_lines:[],
+            suggestions: []
             //data: getDataProfile(),
             //rows:setRows
         }
         this._updateInput = this._updateInput.bind(this);
+        
         this._updateAddress = this._updateAddress.bind(this);
+        /*
+        this.choiseAddress = this.choiseAddress.bind(this);
+        this._addressBlur = this._addressBlur.bind(this);
+        this._handleKeyDown = this._handleKeyDown.bind(this);
+        */
         this._updateSelect = this._updateSelect.bind(this);
 
-        this._handleKeyDown = this._handleKeyDown.bind(this);
+        
         
         this._enter = this._enter.bind(this);
         this._esc = this._esc.bind(this);
-        
-        
+
+        /*
+        this.onChange = this.onChange.bind(this);
+        this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
+        this.onSuggestionsClearRequested = this.onSuggestionsClearRequested.bind(this);
+        */
+
     }
+
+    /*
+    onChange (event, { newValue, method }) {
+    //onChange = (event, { newValue, method }) => {    
+        this.setState({ value: newValue });
+    }
+      
+    onSuggestionsFetchRequested  ({ value }) {
+    fetch(`https://swapi.co/api/people/?search=${value}`)
+        .then(response => response.json())
+        .then(data => this.setState({ suggestions: data.results }))
+    }
+
+    onSuggestionsClearRequested ()  {
+        this.setState({ suggestions: [] });
+    };
+    */
+
+
     options(selector){
         let dictionart_array=[];
         if(sessionStorage.getItem(selector)){
@@ -116,7 +154,7 @@ class Profile_base extends Component {
         }
     }
     _loadAsyncData(customerID) {
-        console.log("fetch")
+        //console.log("fetch")
         fetch('/api/customers/'+customerID)
             .then(response => response.json())
             .then((response)=>{
@@ -125,30 +163,36 @@ class Profile_base extends Component {
                 this.setState({newRecord:response})
                 
                 this.setState({loading:false})
-                console.log(this.state.newRecord["martial_id"])
+                //console.log(this.state.newRecord["martial_id"])
             })
     }
     
     _updateInput(event){
-        
         const target = event.target;
-        //let newRecord=this.state.newRecord
-        //console.log(newRecord)
-        //this.state.newRecord[target.name]=target.value
-        /*
-        console.log(this.state)
-        this.setState(newRecord)
-        */
-        console.log(this.state)
-        
+        this.setState({
+            newRecord:{
+                ...this.state.newRecord,
+                [target.name]: target.value
+            }
+        })
     }
+
     _updateAddress(event){
         const target = event.target;
+
+        this.setState({
+            newRecord:{
+                ...this.state.newRecord,
+                [target.name]: target.value,
+            }
+        })
+        /*
         let newRecord=this.state.newRecord
         newRecord[target.name]=target.value
         this.setState({newRecord})
-        //console.log(target.value)
-
+        //console.log(target.name)
+    */
+        
         fetch('https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address', {
             method: 'POST',
             body: JSON.stringify({ "query": target.value, "count": 10 }),
@@ -160,31 +204,63 @@ class Profile_base extends Component {
         })
         .then(response => response.json())
         .then((data)=>{
-            //console.log(data.suggestions)
-            
-            this.setState({"address_reg_line":data.suggestions})
+            let lines_name=target.name+"_line"
+            //this.setState({[lines_name]:data.suggestions})
 
-            //let array_lines='<div className="address_hint_line">адрес1</div>'
-            //this.setState({"address_reg_line":array_lines})
-            //console.log(this.state)
-            //address_reg_lines
-            //console.log(data)
+            this.setState({
+                address_lines:{
+                    ...this.state.address_lines,
+                    key_address:lines_name,
+                    data_address:data.suggestions,
+
+                    //[lines_name]: data.suggestions,
+                }
+            })
+            //address_lines[]
         })
+        //console.log(this.state)
+    }
+    /*
+    choiseAddress(key){
+        console.log(key)
+        let address_arr=this.state.address_lines.data_address
+        let address_itm=address_arr[key]
+        this.setState({
+            newRecord:{
+                ...this.state.newRecord,
+                address_reg: address_itm.value,
+                index_address_reg:address_itm.data.postal_code!=null?address_itm.data.postal_code:""
+            }
+        })
+    }
+    _addressBlur(event){
+        
+        this.setState({
+            address_lines:{
+                ...this.state.address_lines,
+                key_address:"",
+                data_address:[],
+            }
+        })    
     }
     _handleKeyDown(e){
         let newRecord=this.state.newRecord
-
         if (e.key === 'Enter') {
-            if(this.state.address_reg_line.length){
-                let address=this.state.address_reg_line[0]
-                //console.log(this.state.address_reg_line[0].value)
-                newRecord["address_reg"]=address.value
-                newRecord["index_address_reg"]=address.data.postal_code
-                this.setState(newRecord)
-            }
+            this.setState({
+                address_lines:{
+                    ...this.state.address_lines,
+                    key_address:"",
+                    data_address:[],
+                }
+            })
         }
-    }
+        if(e.key==='ArrowDown'){
 
+        }
+        //console.log(e.key)
+        
+    }
+*/
     _updateSelect(newValue, actionMeta){
         let new_value=null
         let newRecord=this.state.newRecord
@@ -213,10 +289,7 @@ class Profile_base extends Component {
     }
     _esc(){
         console.log("esc")
-        /*
-        let data=this.state.data
-        let newRecord=this.state.newRecord
-        */
+       
         //console.log(data)
         //this.setState({newRecord:data})
         console.log(this.state)
@@ -224,8 +297,7 @@ class Profile_base extends Component {
     _enter(){
         //console.log(this.state.data)
         //console.log(this.state.data)
-        
-        console.log(this.state.newRecord)
+       
         fetch('/api/customers/'+this.props.customerID, {
                 method: 'PUT',
                 body: JSON.stringify(this.state.newRecord),
@@ -238,9 +310,11 @@ class Profile_base extends Component {
             .then((data)=>{
                 //console.log(data)
             })
-        /**/
+        
 
     }
+    /**/
+    
 /**
  * defaultValue={this.options("martial").find(op => {
                                         console.log(op.value+"="+this.state.newRecord["martial"])
@@ -250,38 +324,70 @@ class Profile_base extends Component {
  */
 
     render() { 
-        let address_reg_lines=null
-        //if(this.state.address_reg_line){
-        if(this.state.address_reg_line.length){
-            address_reg_lines=this.state.address_reg_line.map((item,key)=>
-                <div key={key} className="address_hint_line" onClick={(key)=>this.choiseAddress}>{item.value}</div>
+            
+        let data_address_lines=[]
+        
+        //console.log(this.state.address_lines)
+        if(this.state.address_lines.key_address){
+            data_address_lines[this.state.address_lines.key_address]=this.state.address_lines.data_address.map((item,key)=>
+                <div key={key} className="address_hint_line" onClick={()=>this.choiseAddress(key)}>{item.value}</div>
             )
         }
+
+        //console.log(data_address_lines)
+        /*
+        for(address_lines in this.state.data_address_lines){
+            console.log(address_lines)
+            //data_address_lines[]
+        }
+        */
+/*
+        if(this.state.data_address_lines.length){
+            for()
+        }
+*/
+        //data_address_lines["address_reg_lines"]
+
+        //console.log()
+        //if(this.state.address_reg_line){
+        /*
+        if(this.state.address_reg_line.length){
+            address_reg_lines=this.state.address_reg_line.map((item,key)=>
+                <div key={key} className="address_hint_line" onClick={()=>this.choiseAddress(key)}>{item.value}</div>
+            )
+        }
+        */
+
         //}
 
         let profile_info=!this.state.loading?
         <div>
+           
             <div className="tab_block">
                 <div className="frm_row">
                     <div className="col2">
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Фамилия</div>
-                            <input name="surname" onChange={this._updateInput} type="text" className="itm_input" defaultValue={this.state.newRecord.surname}/>
+                            <input value={this.state.newRecord.surname} name="surname" onChange={this._updateInput} type="text" className="itm_input"/>
                         </div>
                     </div>
-                    <div className="col"></div>
+                    <div className="col">
+                        <div className="profilePhoto" style={{backgroundImage:"url(../uploads/photo/3/terry-crews-person-of-year-2017-time-magazine-facebook-1.jpg)"}}>
+                            
+                        </div>
+                    </div>
                 </div>
                 <div className="frm_row">
                     <div className="col">
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Имя</div>
-                            <input name="name" onChange={this._updateInput} type="text" className="itm_input" defaultValue={this.state.newRecord.name} />
+                            <input value={this.state.newRecord.name} name="name" onChange={this._updateInput} type="text" className="itm_input"/>
                         </div>
                     </div>
                     <div className="col">
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Отчество</div>
-                            <input name="patronymic" onChange={this._updateInput} type="text" className="itm_input" defaultValue={this.state.newRecord.patronymic} />
+                            <input value={this.state.newRecord.patronymic} name="patronymic" onChange={this._updateInput} type="text" className="itm_input"/>
                         </div>
                     </div>
                     <div className="col"></div>
@@ -295,6 +401,30 @@ class Profile_base extends Component {
                     </div>
                     <div className="col"></div><div className="col"></div>
                 </div>
+                
+                <div className="frm_row">
+                    <div className="col">
+                        <div className="wrp_itm_input">
+                            <div className="itm_caption">Мобильный телефон</div>
+                            
+                            <PhoneInput
+                                inputClass="itm_input"
+                                country={'ru'}
+                                name="mobphone"
+                                value={this.state.newRecord.mobphone}
+                                onChange={this._updateInput}
+                            />
+                        </div>
+                    </div>
+                    <div className="col">
+                        <div className="wrp_itm_input">
+                            <div className="itm_caption">Телефон</div>
+                            <input type="text" className="itm_input"/>
+                        </div>
+                    </div>
+                    <div className="col"></div>
+                </div>
+
 
                 <div className="frm_row">
                     <div className="col">
@@ -354,13 +484,22 @@ class Profile_base extends Component {
                     <div className="col2">
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Адрес регистрации</div>
-                            <input onKeyDown={this._handleKeyDown} autoComplete="new-password" name="patronymic" onChange={this._updateAddress} name="address_reg" type="text" className="itm_input" defaultValue={this.state.data.address_reg}/>
+                            <input 
+                                value={this.state.newRecord.address_reg} 
+                                onKeyDown={this._handleKeyDown} 
+                                onBlur={this._addressBlur} 
+                                autoComplete="new-password" 
+                                onChange={this._updateAddress} 
+                                name="address_reg" 
+                                type="text" 
+                                className="itm_input" />
                         </div>
-                        {address_reg_lines?
+
+                        {data_address_lines["address_reg_line"]?
                             <div className="wrp_address_hint">
                                 <div className="address_hint_caption">Выберите вариант или продолжите ввод</div>
                                 <div className="address_hint_lines">
-                                    {address_reg_lines}
+                                    {data_address_lines["address_reg_line"]}
                                 </div>
                             </div>
                         :''}
@@ -369,7 +508,7 @@ class Profile_base extends Component {
                     <div className="col">
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Индекс адреса регистрации</div>
-                            <input name="index_address_reg" type="text" onChange={this._updateInput} className="itm_input" defaultValue={this.state.data.index_address_reg} />
+                            <input value={this.state.newRecord.index_address_reg} name="index_address_reg" type="text" onChange={this._updateInput} className="itm_input"/>
                         </div>
                     </div>
                 </div>
@@ -377,8 +516,25 @@ class Profile_base extends Component {
                     <div className="col2">
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Адрес проживания</div>
-                            <input type="text" className="itm_input" defaultValue={this.state.data.address_res}/>
+                            <input 
+                                value={this.state.newRecord.address_res} 
+                                onKeyDown={this._handleKeyDown} 
+                                onBlur={this._addressBlur} 
+                                autoComplete="new-password" 
+                                onChange={this._updateAddress} 
+                                name="address_res" 
+                                type="text" 
+                                className="itm_input"
+                            />
                         </div>
+                        {data_address_lines["address_res_line"]?
+                            <div className="wrp_address_hint">
+                                <div className="address_hint_caption">Выберите вариант или продолжите ввод</div>
+                                <div className="address_hint_lines">
+                                    {data_address_lines["address_res_line"]}
+                                </div>
+                            </div>
+                        :''}
                     </div>
                     <div className="col">
                         <div className="wrp_itm_input">

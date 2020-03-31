@@ -26,36 +26,31 @@ class Customers extends Component {
             products: [],
         }
         this.updateData = this.updateData.bind(this)
-        this.escFunction = this.escFunction.bind(this)
+        //this.escFunction = this.escFunction.bind(this)
         this.showProfile = this.showProfile.bind(this)
-    }
-    componentDidMount() {
+        this.keyFunction = this.keyFunction.bind(this)
         
-        
-        /* fetch API in action */
-        /*
-        fetch('/api/products')
-            .then(response => {
-                return response.json();
-            })
-            .then(products => {
-                //Fetched product is stored in the state
-                this.setState({ products });
-            });
-        */
-    } 
-    renderProducts() {
-        return this.state.products.map(product => {
-            return (
-                /* When using list you need to specify a key
-                 * attribute that is unique for each list item
-                */
-                <li key={product.id} >
-                    { product.title } 
-                </li>      
-            );
-        })
+
     }
+    componentDidMount(){
+        sessionStorage.setItem("key_action", "customers")
+        document.addEventListener("keydown", this.keyFunction, false);
+    }
+    
+    componentWillUnmount(){
+        document.removeEventListener("keydown", this.keyFunction, false);
+    }
+    keyFunction(event){
+        if(sessionStorage.getItem("key_action")=="customers"){
+            if(event.keyCode === 27) {
+                //Do whatever when esc is pressed
+                console.log("customers_esc")
+                //Скрываем Profile_Info
+                this.setState({stateActive:0})
+            }
+        }
+    }
+
     escMethod(){
         
     }
@@ -69,20 +64,9 @@ class Customers extends Component {
     setInfo(stateActive){
         this.setState({stateActive:stateActive})
     }
-
-    componentDidMount(){
-        document.addEventListener("keydown", this.escFunction, false);
-    }
-    escFunction(event){
-        if(event.keyCode === 27) {
-            //Do whatever when esc is pressed
-            console.log("esc")
-            this.setState({stateActive:0})
-        }
-    }
-    componentWillUnmount(){
-        document.removeEventListener("keydown", this.escFunction, false);
-    }
+    
+    
+    
     showProfile(val){
         //console.log(val)
         this.setState({customerID:val})
@@ -111,7 +95,6 @@ class Customers extends Component {
                     />
                 </div>
                 
-
                 {this.state.stateActive>0?
                     <div className="block_info">
                         <div className="tab_list">

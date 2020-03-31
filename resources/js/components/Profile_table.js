@@ -39,7 +39,7 @@ class Profile_table extends Component {
     render() { 
         return (
             <div>                
-                {this.props.stateAction==1?
+                <div style={{display: this.props.stateAction==1 ? 'block' : 'none' }}>
                     <FlexigridItem 
                         customerID={this.props.customerID}
                         url={this.props.url}
@@ -48,7 +48,7 @@ class Profile_table extends Component {
                         //columns_order={this.state.columns_order}
                         //columns_sort={this.state.columns_sort}
                     />
-                :''}
+                </div>
                 {this.props.stateAction>1?
                     <Profile_table_edit 
                         action={this.props.stateAction}
@@ -66,33 +66,5 @@ class Profile_table extends Component {
         )
     }
 }
-/*
-columnExt={this.state.columnExt}
-columnWidth={this.state.columnWidth}
 
-                {this.state.showtable==1?
-                    <FlexigridItem/>
-                :''}
-                {this.state.showtable==2?
-                    <div className="profile_info_edit">
-                        <div className="profile_info_edit_caption">Добавление записи в трудовую книжку</div>
-                    </div>
-                :''}
-                {this.state.showtable==3?
-                    <div className="profile_info_edit">
-                        <div className="profile_info_edit_caption">Изменение записи в трудовой книжке</div>
-                    </div>
-                :''}
-                
-<FlexigridItem 
-                
-                        customerID={this.props.customerID} 
-                        clickData={this._editRecord} 
-                        url='/api/customer_history/'
-                        columns={this.state.columns}
-                        columnExt={this.state.columnExt}
-                        columnWidth={this.state.columnWidth}
-                    />
-
- */
 export default Profile_table;

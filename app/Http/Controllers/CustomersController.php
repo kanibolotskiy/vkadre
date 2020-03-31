@@ -47,7 +47,8 @@ class CustomersController extends Controller
         leftjoin('property_martials as pm', 'pm.id', '=', 'customers.martial_id')
         ->leftjoin('property_genders as pg', 'pg.id', '=', 'customers.gender_id')
         ->select(
-            'customers.id','customers.dob','pm.name as martial','pg.name as gender',
+            'customers.id','customers.dob','customers.mobphone','customers.phone',
+            'pm.name as martial','pg.name as gender',
             DB::raw('CONCAT(customers.surname," ",customers.name," ",customers.patronymic) as name'))
         ->get();
     }

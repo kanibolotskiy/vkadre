@@ -17,9 +17,9 @@ class Organization extends Component {
                     url:'customer_btrip',
                     columns:[
                         {name:'date', title:'Даты',title_from:'Дата начала коммандировки',title_to:'Дата завершения коммандировки', type:'double_date', required:true, align: 'left', width:100 },
-                        {name:'place', title:'Место коммандировки', type:'textarea', required:true, align: 'left', width:100},
-                        {name:'goal', title:'Цель', type:'textarea', required:false, align: 'left', width:100},
-                        {name:'base', title:'Основание', type:'textarea', required:false, align: 'left', width:100},
+                        {name:'place', title:'Место коммандировки', type:'text', required:true, align: 'left', width:100},
+                        {name:'goal', title:'Цель коммандировки', type:'text', required:false, align: 'left', width:100},
+                        {name:'base', title:'Основание', type:'text', required:false, align: 'left', width:100},
                     ],
                     sortOrder:[
                         {columnName: 'date', direction: 'ASC' }
@@ -27,8 +27,8 @@ class Organization extends Component {
                     params:{
                         captionAdd:'Добавление коммандировки',
                         captionEdit:'Редактирование коммандировки',
-                        captionAddButton:'Добавить коммандировку',
-                        captionEditButton:'Изменить коммандировку',
+                        captionAddButton:'Добавить запись',
+                        captionEditButton:'Изменить запись',
                     }
                 },
                 {
@@ -38,8 +38,8 @@ class Organization extends Component {
                     url:'customer_hospital',
                     columns:[
                         {name:'date', title:'Даты',title_from:'Дата начала больничного',title_to:'Дата завершения больничного', type:'double_date', required:true, align: 'left', width:100 },
-                        {name:'cause', title:'Причина', type:'textarea', required:true, align: 'left', width:100},
-                        {name:'base', title:'Основание', type:'textarea', required:false, align: 'left', width:100},
+                        {name:'cause', title:'Причина', type:'text', required:true, align: 'left', width:100},
+                        {name:'base', title:'Основание', type:'text', required:false, align: 'left', width:100},
                     ],
                     sortOrder:[
                         {columnName: 'date', direction: 'ASC' }
@@ -47,8 +47,8 @@ class Organization extends Component {
                     params:{
                         captionAdd:'Добавление больничного',
                         captionEdit:'Редактирование больничного',
-                        captionAddButton:'Добавить больничный',
-                        captionEditButton:'Изменить больничный',
+                        captionAddButton:'Добавить запись',
+                        captionEditButton:'Изменить записьпше зг',
                     }
                 },
                 {
@@ -59,7 +59,7 @@ class Organization extends Component {
                     columns:[
                         {name:'date', title:'Даты',title_from:'Дата начала отпуска',title_to:'Дата завершения отпуска', type:'double_date', required:true, align: 'left', width:100 },
                         {name:'typevacation', title:'Тип', type:'selector', required:true, align: 'left', width:100},
-                        {name:'base', title:'Основание', type:'textarea', required:false, align: 'left', width:100},
+                        {name:'base', title:'Основание', type:'text', required:false, align: 'left', width:100},
                     ],
                     sortOrder:[
                         {columnName: 'date', direction: 'ASC' }
@@ -78,8 +78,8 @@ class Organization extends Component {
                     url:'customer_promotion',
                     columns:[
                         {name:'date', title:'Дата', type:'date', required:true, align: 'left', width:100 },
-                        {name:'comment', title:'Комментарий', type:'textarea', required:true, align: 'left', width:100},
-                        {name:'base', title:'Основание', type:'textarea', required:false, align: 'left', width:100},
+                        {name:'comment', title:'Комментарий', type:'text', required:true, align: 'left', width:100},
+                        {name:'base', title:'Основание', type:'text', required:false, align: 'left', width:100},
                     ],
                     sortOrder:[
                         {columnName: 'date', direction: 'ASC' }
@@ -87,8 +87,8 @@ class Organization extends Component {
                     params:{
                         captionAdd:'Добавление поощрения',
                         captionEdit:'Редактирование поощрения',
-                        captionAddButton:'Добавить поощрение',
-                        captionEditButton:'Изменить поощрение',
+                        captionAddButton:'Добавить запись',
+                        captionEditButton:'Изменить запись',
                     }
                 },
 
@@ -97,8 +97,9 @@ class Organization extends Component {
             ]
             //stateActive:this.props.selected
         }
-        this.changeState = this.changeState.bind(this)
+        //this.changeState = this.changeState.bind(this)
         this.setAction = this.setAction.bind(this)
+        this.addNew = this.addNew.bind(this)
     }
     setInfo(stateActive){
         this.props.updateData(stateActive,'stateActiveOrganization')
@@ -107,11 +108,10 @@ class Organization extends Component {
     setAction(stateAction=1){
         this.setState({stateAction:stateAction})
     }
-    componentDidMount(){
-        
-    }
-    changeState(){
-        
+    addNew(){
+        if(this.state.stateAction==1){
+            this.setState({stateAction:2})
+        }
     }
     render() { 
         const tab_blocks_header = []    //Вкладки профиля
@@ -123,7 +123,7 @@ class Organization extends Component {
                 <div key={index+1} onClick={()=>this.setInfo(item.selected)} className={this.props.selected==item.selected? 'active':''}>{item.name}</div>
             )
             tab_btns.push(
-                this.props.selected==item.selected?<div key={index} className="btn" onClick={()=>this.setAction(2)}>{item.button}</div>:'' 
+                this.props.selected==item.selected?<div key={index} className="btn" onClick={this.addNew}>{item.button}</div>:'' 
             )
             block_tables.push(
                 this.props.selected==item.selected? 
@@ -146,7 +146,7 @@ class Organization extends Component {
                         <div onClick={()=>this.setInfo(1)} className={this.props.selected==1? 'active':''}>Основное</div>
                         {tab_blocks_header}
                     </div>
-                    <div className="btns">
+                    <div className={"btns "+(this.state.stateAction==1?'':'unactive')} >
                         {tab_btns}
                         <div className="btn">Печать</div>
                     </div>

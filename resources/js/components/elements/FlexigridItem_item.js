@@ -138,6 +138,7 @@ export default (m_props) => {
           selector: columnName,
           order: direction,
         }));
+        console.log(sortingConfig)
       const sortingStr = JSON.stringify(sortingConfig);
       console.log(sortingStr)
       queryString = `${queryString}&sort=${escape(`${sortingStr}`)}`;

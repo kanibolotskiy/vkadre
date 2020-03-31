@@ -8,9 +8,12 @@ export default class Confirm extends Component {
           };
           this.pressEnter = this.pressEnter.bind(this);
           this.pressEsc = this.pressEsc.bind(this);
+          this.keyFunction = this.keyFunction.bind(this);
+          
+
     }
-    componentDidMount(){
-        
+    componentWillUnmount(){
+        document.removeEventListener("keydown", this.keyFunction, false);
     }
     pressEnter(){
         this.props.setAnswer(true)
@@ -18,6 +21,21 @@ export default class Confirm extends Component {
     pressEsc(){
         this.props.setAnswer(false)
     }
+    keyFunction(event){
+        if(sessionStorage.getItem("key_action")=="answer"){
+            if(event.keyCode === 13) { //Подтверждение
+                this.pressEnter()
+            }
+            if(event.keyCode === 27) { //Отмена
+                this.pressEsc()
+            }            
+        }
+    }
+    componentDidMount(){
+        sessionStorage.setItem("key_action", "answer")
+        document.addEventListener("keydown", this.keyFunction, false);
+    }
+    
     
     render() {
         

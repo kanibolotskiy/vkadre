@@ -16,8 +16,8 @@ class Profile extends Component {
                     url:'customer_history',
                     columns:[
                         {name:'date', title:'Дата', type:'date', required:true, align: 'left', width:100 },
-                        {name:'record', title:'Запись', type:'textarea', required:true, align: 'left', width:100},
-                        {name:'base', title:'Основание', type:'textarea', required:false, align: 'left', width:100},
+                        {name:'record', title:'Запись', type:'text', required:true, align: 'left', width:100},
+                        {name:'base', title:'Основание', type:'text', required:false, align: 'left', width:100},
                     ],
                     sortOrder:[
                         {columnName: 'date', direction: 'ASC' }
@@ -36,10 +36,10 @@ class Profile extends Component {
                     url:'customer_property',
                     columns:[
                         {name:'typeproperty', title:'Тип', type:'selector', required:true, align: 'left', width:100 },
-                        {name:'property', title:'Имущество', type:'textarea', required:true, align: 'left', width:100},
+                        {name:'property', title:'Имущество', type:'text', required:true, align: 'left', width:100},
                         {name:'summa', title:'Стоимость', type:'currency', required:false, align: 'left', width:100},
                         {name:'date', title:'Дата приобретения', type:'date', required:false, align: 'left', width:100},
-                        {name:'comment', title:'Комментарий', type:'textarea', required:false, align: 'left', width:100},
+                        {name:'comment', title:'Комментарий', type:'text', required:false, align: 'left', width:100},
                     ],
                     sortOrder:[
                         { columnName: 'typeproperty_name', direction: 'ASC' }
@@ -80,7 +80,7 @@ class Profile extends Component {
                     url:'customer_medical',
                     columns:[
                         { name: 'date', title: 'Дата внесения', type:'date', required:true, align: 'left', width:100  },
-                        { name: 'memo', title: 'Заметка', type:'textarea', required:true, align: 'left', width:100  },
+                        { name: 'memo', title: 'Заметка', type:'text', required:true, align: 'left', width:100  },
                     ],
                     sortOrder:[
                         { columnName: 'date', direction: 'desc' }
@@ -96,9 +96,32 @@ class Profile extends Component {
             ]
             //stateActive:this.props.selected
         }
-        this.changeState = this.changeState.bind(this)
+        //this.changeState = this.changeState.bind(this)
         this.setAction = this.setAction.bind(this)
+        this.addNew = this.addNew.bind(this)
+        
+
     }
+    /*
+    componentDidMount(){
+        sessionStorage.setItem("key_action", "profile_base")
+        document.addEventListener("keydown", this.keyFunction, false);
+    }*/
+    /*
+    componentWillUnmount(){
+        document.removeEventListener("keydown", this.keyFunction, false);
+    }
+    */
+    keyFunction(event){
+        if(sessionStorage.getItem("key_action")=="profile"){
+            if(event.keyCode === 27) {
+                console.log("profile_esc")
+            }
+        }
+    }
+
+
+
     setInfo(stateActive){
         this.props.updateData(stateActive,'stateActiveProfile')
         this.setState({stateAction:1})
@@ -106,12 +129,12 @@ class Profile extends Component {
     setAction(stateAction=1){
         this.setState({stateAction:stateAction})
     }
-    componentDidMount(){
-        
+    addNew(){
+        if(this.state.stateAction==1){
+            this.setState({stateAction:2})
+        }
     }
-    changeState(){
-        
-    }
+    
     render() { 
 
         const tab_blocks_header = []    //Вкладки профиля
@@ -123,7 +146,7 @@ class Profile extends Component {
                 <div key={index+1} onClick={()=>this.setInfo(item.selected)} className={this.props.selected==item.selected? 'active':''}>{item.name}</div>
             )
             tab_btns.push(
-                this.props.selected==item.selected?<div key={index} className="btn" onClick={()=>this.setAction(2)}>{item.button}</div>:'' 
+                this.props.selected==item.selected?<div key={index} className="btn" onClick={this.addNew}>{item.button}</div>:'' 
             )
             block_tables.push(
                 this.props.selected==item.selected? 
@@ -146,16 +169,13 @@ class Profile extends Component {
                         <div key={0} onClick={()=>this.setInfo(1)} className={this.props.selected==1? 'active':''}>Основное</div>
                         {tab_blocks_header}
                     </div>
-                    <div className="btns">
+                    <div className={"btns "+(this.state.stateAction==1?'':'unactive')} >
                         {tab_btns}
                         <div className="btn">Печать</div>
                     </div>
                 </div>
                 {this.props.selected==1? <Profile_base customerID={this.props.customerID} />:''}
-
                 {block_tables}
-   
-
             </div>
         )
     }

@@ -82,6 +82,7 @@ class Profile_table_edit extends Component {
             newRecord:{
                 customer_id: this.props.customerID,
             },
+            
             loging:false,
             errorRecord:{}
         }
@@ -97,20 +98,45 @@ class Profile_table_edit extends Component {
 
         this.showConfirm = this.showConfirm.bind(this)
         this.setAnswer = this.setAnswer.bind(this)
+    
+        this.keyFunction = this.keyFunction.bind(this)
+        this.setTableData = this.setTableData.bind(this)
         
     }
-    componentDidMount(){
-        
+    componentWillUnmount(){
+        document.removeEventListener("keydown", this.keyFunction, false);
+    }
+    keyFunction(event){
+        if(sessionStorage.getItem("key_action")=="profile_table_edit"){
+            if(event.keyCode === 27) {  
+                this._esc()
+            }
+            if(event.keyCode === 13) {
+                this.addRecord()
+            }
+        }
+    }
+    _esc(){
+        const data_changed=(JSON.stringify(this.state.newRecord)===JSON.stringify(this.state.oldRecord));
+        if(data_changed){//Выход наружу
+            this.props.setAction(1)  
+        }else{//Отмена изменений
+            let oldRecord=this.state.oldRecord
+            this.setState({newRecord:oldRecord})
+            this.setTableData()
+        }
+    }
+
+    setTableData(){
         let newRecord=this.state.newRecord
         let newRecordDates=this.state.newRecordDates
         
-
         let errorRecord=this.state.errorRecord
         for(let itm in this.props.columns){
             let elem=this.props.columns[itm]
             //Расставляем элементы для формы
             if(this.props.action==2){
-                newRecord[elem.name]=null
+                newRecord[elem.name]=""
             }else{
                 //console.log(elem.type)
                 switch (elem.type){
@@ -150,14 +176,20 @@ class Profile_table_edit extends Component {
                         
                     break;
                     default:
-                        newRecord[elem.name]=this.props.rowData[elem.name]
+                        newRecord[elem.name]=this.props.rowData[elem.name]?this.props.rowData[elem.name]:""
                 }
             }
         }
         
-        this.setState({newRecord})
+        this.setState({newRecord:newRecord})
+        this.setState({oldRecord:newRecord})
+        this.setState(errorRecord)
+    }
+    componentDidMount(){
+        sessionStorage.setItem("key_action", "profile_table_edit")
+        document.addEventListener("keydown", this.keyFunction, false);
+        this.setTableData()
         this.setState({"loading":true})
-        this.setState({errorRecord})
     }
     
     addRecord_validate(){
@@ -198,8 +230,8 @@ class Profile_table_edit extends Component {
                 }   
             }
         }
-        console.log(flag)
-        console.log(errorRecord)
+        //console.log(flag)
+        //console.log(errorRecord)
         this.setState({errorRecord})
         return flag;
     }
@@ -254,60 +286,113 @@ class Profile_table_edit extends Component {
         let newRecordDates=this.state.newRecordDates
         let errorRecord=this.state.errorRecord
 
-        newRecord[name]=date_str
-        newRecordDates[name]=value
+        //newRecord[name]=date_str
+        //newRecordDates[name]=value
         errorRecord[name]=false
-        this.setState({newRecordDates})
-        this.setState({newRecordDates})
+
+        this.setState({
+            newRecord:{
+                ...this.state.newRecord,
+                [name]: date_str
+            }
+        })
+        this.setState({
+            newRecordDates:{
+                ...this.state.newRecordDates,
+                [name]: value
+            }
+        })
+
+        //this.setState({newRecord})
+        //this.setState({newRecordDates})
         this.setState({errorRecord})
     }
     handleChange(event){
         const target = event.target;
-        let newRecord=this.state.newRecord
+        
         let errorRecord=this.state.errorRecord
-        newRecord[target.name]=target.value
         errorRecord[target.name]=false
-        this.setState({newRecord})
+
+        //let newRecord=this.state.newRecord
+        //newRecord[target.name]=target.value
+        //this.setState({newRecord})
         this.setState({errorRecord})
+
+        this.setState({
+            newRecord:{
+                ...this.state.newRecord,
+                [target.name]: target.value
+            }
+        })
+
+        console.log(this.state)
     }
     handleChangeCurrency(name, value){
         //console.log(event)
-        let newRecord=this.state.newRecord
+        //let newRecord=this.state.newRecord
         let errorRecord=this.state.errorRecord
-        newRecord[name]=value
         errorRecord[name]=false
-        this.setState({newRecord})
         this.setState({errorRecord})
+
+        //newRecord[name]=value        
+        //this.setState({newRecord})
+        
+        this.setState({
+            newRecord:{
+                ...this.state.newRecord,
+                [name]: value
+            }
+        })
 
     }
     handleChangeSelect(newValue, actionMeta){
-        console.log(newValue)
-        console.log(actionMeta)
         let new_value=null
-        let newRecord=this.state.newRecord
+        //let newRecord=this.state.newRecord
         let errorRecord=this.state.errorRecord
-        
+
+        let select_value_id=null
+        let select_value_name=null
+
         switch (actionMeta.action){
             case "select-option":
+                select_value_id=newValue.value
+    
+                /*
                 newRecord[actionMeta.name+"_id"]=newValue.value
                 newRecord[actionMeta.name+"_name"]=null
+                */
                 errorRecord[actionMeta.name]=false
             break;
             case "create-option":
+                //let select_value_id=null
+                select_value_name=newValue.value
+                /*
                 newRecord[actionMeta.name+"_id"]=null
                 newRecord[actionMeta.name+"_name"]=newValue.value
+                */
                 errorRecord[actionMeta.name]=false
             break;
             case "clear":
+                /*
                 newRecord[actionMeta.name+"_id"]=null
                 newRecord[actionMeta.name+"_name"]=null
+                */
+                //let select_value_id=null
+                //let select_value_name=null
+
             break;
             default:
         }
-        
-        this.setState({newRecord})
+        //this.setState({newRecord})
+        this.setState({
+            newRecord:{
+                ...this.state.newRecord,
+                [actionMeta.name+"_id"]: select_value_id,
+                [actionMeta.name+"_name"]: select_value_name
+            }
+        })
         this.setState({errorRecord})
-        
+        console.log(this.state)
     }
     options(selector){
         let dictionart_array=[];
@@ -316,20 +401,18 @@ class Profile_table_edit extends Component {
         }
         return dictionart_array
     }
-    _esc(){
-        //console.log("esc")
-        this.props.setAction(1)
-        //this.props.setAction(1)
-    }
+    
     showConfirm(){
         this.setState({"showConfirm":true})
     }
+
     /*
     hideConfirm(){
         this.setState({"showConfirm":false})
     }
     */
     setAnswer(answer){
+        sessionStorage.setItem("key_action", "profile_table_edit")
         if(answer){
             //Удаление записи
             fetch('api/'+this.props.url+"/"+this.props.rowData.id, {
@@ -346,7 +429,6 @@ class Profile_table_edit extends Component {
         }else{
             this.setState({"showConfirm":false})
         }
-        
     }
     renderSwitch(item) {
         //console.log("action="+this.props.action)
@@ -372,12 +454,12 @@ class Profile_table_edit extends Component {
             case 'textarea':
                 return <div className="wrp_itm_input">
                 <div className="itm_caption">{item.title}</div>
-                <TextareaAutosize name={item.name} className={"itm_textarea "+(this.state.errorRecord[item.name]?"_error":"")} defaultValue={this.state.newRecord[item.name]} onChange={this.handleChange}/>
+                <TextareaAutosize name={item.name} className={"itm_textarea "+(this.state.errorRecord[item.name]?"_error":"")} value={this.state.newRecord[item.name]} onChange={this.handleChange}/>
             </div>
             case 'text':
                 return <div className="wrp_itm_input">
                 <div className="itm_caption">{item.title}</div>
-                <input name={item.name} className={"itm_input "+(this.state.errorRecord[item.name]?"_error":"")} defaultValue={this.state.newRecord[item.name]} onChange={this.handleChange}/>
+                <input name={item.name} className={"itm_input "+(this.state.errorRecord[item.name]?"_error":"")} value={this.state.newRecord[item.name]} onChange={this.handleChange}/>
             </div>
             case 'currency':
                 return <div className="wrp_itm_input">
@@ -391,7 +473,7 @@ class Profile_table_edit extends Component {
                     <div className="itm_caption">{item.title}</div>
                     <CreatableSelect 
                         name={item.name}
-                        defaultValue={this.options(item.name).find(op => {
+                        value={this.options(item.name).find(op => {
                             return op.value === this.state.newRecord[item.name+"_id"]
                         })}
                         className={"itm_selector "+(this.state.errorRecord[item.name]?"_error":"")}
@@ -413,7 +495,7 @@ class Profile_table_edit extends Component {
                     <AsyncSelect
                         name={item.name}
                         className={"itm_selector "+(this.state.errorRecord[item.name]?"_error":"")}
-                        defaultValue={{value:this.state.newRecord[item.name+"_id"],label:this.state.newRecord[item.name]}}
+                        value={{value:this.state.newRecord[item.name+"_id"],label:this.state.newRecord[item.name]}}
                         styles={customStyles}
                         formatOptionLabel={formatOptionLabel}
                         placeholder={" - введите - "}
@@ -453,48 +535,7 @@ class Profile_table_edit extends Component {
             break;
             default:
                 return '_error';
-            /*
-            <AsyncCreatableSelect
-                        name={item.name}
-                        className={"itm_selector "+(this.state.errorRecord[item.name]?"_error":"")}
-                        placeholder={" - выберите - "}
-                        styles={customStyles}
-                        isClearable
-                        onChange={this.handleChangeSelect}
-                        //onInputChange={this.handleInputChange}
-                        cacheOptions defaultOptions 
-                        loadOptions={promiseOptions}
-                    />
-
-            <CreatableSelect className="itm_selector"
-                        placeholder={" - выберите - "}
-                        styles={customStyles}
-                        isClearable
-                        onChange={this.handleChangeSelect}
-                        //onInputChange={this.handleInputChange}
-                        options={options}
-                    />
-
-            case 'date':
-$out = <div className="itm_caption">{item.title}</div><DatePicker className={(this.state.errorRecord[name]?"_error":"")} locale="ru" dateFormat="dd.MM.yyyy" selected={this.state.newRecordDates[name]} onChange={(value)=>this.handleChangeDate(name,value)} />
-            break;
-            case 'double_date':
-                return <div classNames="groupDates">
-                    <DatePicker className={(this.state.errorRecord[name]?"_error":"")} locale="ru" dateFormat="dd.MM.yyyy" selected={this.state.newRecordDates[name]} onChange={(value)=>this.handleChangeDate(name,value)} />
-                    <div classNames="devider">-</div>
-                    <DatePicker className={(this.state.errorRecord[name]?"_error":"")} locale="ru" dateFormat="dd.MM.yyyy" selected={this.state.newRecordDates[name]} onChange={(value)=>this.handleChangeDate(name,value)} />
-                </div>
-            case 'textarea':
-                $out = <div className="itm_caption">{item.title}</div>
-                <TextareaAutosize name={name} className={"itm_textarea "+(this.state.errorRecord[name]?"_error":"")} defaultValue={this.state.newRecord[name]} onChange={this.handleChange}/>;
-                break;
-            case 'currency':
-                $out = <div className="itm_caption">{item.title}</div>
-                <CurrencyInput name={name} className="itm_input" precision={0} thousandSeparator={' '} allowEmpty={true} suffix={' Р'} />;
-                break;
-            default:
-            return 'foo';
-            */
+            
         }
     
       }
@@ -511,6 +552,9 @@ $out = <div className="itm_caption">{item.title}</div><DatePicker className={(th
         const captionButton=this.props.action==2?this.props.params.captionAddButton:this.props.params.captionEditButton
         const deleteButton=this.props.action==3?<div  onClick={this.showConfirm} className="deleteRow">Удалить</div>:''
         const confirm=this.state.showConfirm?<Confirm setAnswer={this.setAnswer}/>:''
+
+        const data_changed=(JSON.stringify(this.state.newRecord)===JSON.stringify(this.state.oldRecord));
+
         return (
             <div className="profile_info_edit">
                 {confirm}
@@ -520,41 +564,15 @@ $out = <div className="itm_caption">{item.title}</div><DatePicker className={(th
                 </div>
                 {form_items}
                 
-
                 <div className="wrap_btns">
-                    <div className="btn btn_esc" onClick={this._esc}>Отменить (Esc)</div>
-                    <div className="btn btn_enter" onClick={this.addRecord}>{captionButton}</div>
+                    <div className="btn btn_esc" onClick={this._esc}>
+                        {data_changed?'Выход':'Отменить'} (Esc)
+                    </div>
+                    <div className={"btn btn_enter "+(data_changed?'unactive':'')} onClick={this.addRecord}>{captionButton} (Enter)</div>
                 </div>
             </div>
         )
     }
 }
-/*
-<div className="frm_row">
-    <div className="col">
-        <div className="wrp_itm_input">
-            <div className="itm_caption">Дата записи</div>
-            <DatePicker 
-                locale="ru"
-                dateFormat="dd.MM.yyyy" 
-                selected={this.state.startDate}
-                onChange={this.handleChange}
-            />
-        </div>
-    </div>
-</div>
 
-<div className="frm_row">
-    <div className="wrp_itm_input">
-        <div className="itm_caption">Запись</div>
-        <TextareaAutosize className="itm_textarea"/>
-    </div>
-</div>
-<div className="frm_row">
-    <div className="wrp_itm_input">
-        <div className="itm_caption">Основание</div>
-        <TextareaAutosize className="itm_textarea"/>
-    </div>                
-</div>
-    */
 export default Profile_table_edit;
