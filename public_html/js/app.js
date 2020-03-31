@@ -92720,7 +92720,7 @@ var Organization = /*#__PURE__*/function (_Component) {
           captionAdd: 'Добавление больничного',
           captionEdit: 'Редактирование больничного',
           captionAddButton: 'Добавить запись',
-          captionEditButton: 'Изменить записьпше зг'
+          captionEditButton: 'Изменить запись'
         }
       }, {
         name: "Отпуск",

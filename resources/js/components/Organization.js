@@ -48,7 +48,7 @@ class Organization extends Component {
                         captionAdd:'Добавление больничного',
                         captionEdit:'Редактирование больничного',
                         captionAddButton:'Добавить запись',
-                        captionEditButton:'Изменить записьпше зг',
+                        captionEditButton:'Изменить запись',
                     }
                 },
                 {
