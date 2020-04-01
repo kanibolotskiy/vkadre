@@ -179,7 +179,7 @@ export default (m_props) => {
         <DateTypeProvider for={dateColumns}/>
         <CurrencyTypeProvider for={currencyColumns}/>
         <Table rowComponent={rowClick} messages={noDataMsg}/>
-        <TableColumnResizing defaultColumnWidths={defaultColumnWidths} onColumnWidthsChange={onChangeColumnWidth}/>
+        <TableColumnResizing /*resizingMode={"nextColumn"}*/ defaultColumnWidths={defaultColumnWidths} onColumnWidthsChange={onChangeColumnWidth}/>
         <TableHeaderRow showSortingControls/>
         <TableColumnReordering defaultOrder={columnsOrder} onOrderChange={onChangeColumnOrder}/>
         <TableSelection showSelectAll />

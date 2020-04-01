@@ -47,12 +47,14 @@ class CustomersController extends Controller
         leftjoin('property_martials as pm', 'pm.id', '=', 'customers.martial_id')
         ->leftjoin('property_genders as pg', 'pg.id', '=', 'customers.gender_id')
         ->select(
-            'customers.id','customers.dob','customers.mobphone','customers.phone',
+            'customers.id','customers.dob',
+            'customers.mobphone','customers.phone',
             'pm.name as martial','pg.name as gender',
             DB::raw('CONCAT(customers.surname," ",customers.name," ",customers.patronymic) as name'))
         ->get();
     }
- 
+    //DATE_FORMAT(customers.dob,"%d.%m.%Y")
+    //'IFNULL("",cusromers.dob) as dob',
     public function customers_select(Request $request){
         $searchParam=$request->searchParam;
         if($searchParam){
@@ -66,8 +68,17 @@ class CustomersController extends Controller
     }
     
     public function show(Customer $customer)
-    {
+    {   
+        //$returned_customer=$customer;
+        //$returned_customer["dob"]=time();
+        //$dob=$customer->dob;
         
+        //$returned_customer["dob"]=($customer->dob)?date("d.m.Y",strtotime($customer->dob)." 00:00:00"):null;
+        /*
+        return Customer::select(
+            'customers.id'
+        );
+        */
         return $customer;
     }
     

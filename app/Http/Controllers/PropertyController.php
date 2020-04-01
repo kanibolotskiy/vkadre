@@ -10,6 +10,10 @@ use App\Property_typelink;
 use App\Property_martial;
 use App\Property_gender;
 
+use App\Property_education;
+use App\Property_status;
+use App\Property_criminal;
+
 
 class PropertyController extends Controller
 {
@@ -20,6 +24,11 @@ class PropertyController extends Controller
         $properties["typelink"]=Property_typelink::select('id as value','name as label')->orderBy('name','ASC')->get();
         $properties["martial"]=Property_martial::select('id as value','name as label')->orderBy('name','ASC')->get();
         $properties["gender"]=Property_gender::select('id as value','name as label')->orderBy('name','ASC')->get();
+
+        $properties["education"]=Property_education::select('id as value','name as label')->orderBy('name','ASC')->get();
+        $properties["status"]=Property_status::select('id as value','name as label')->orderBy('name','ASC')->get();
+        $properties["criminal"]=Property_criminal::select('id as value','name as label')->orderBy('name','ASC')->get();
+
         return $properties;
     }
 }

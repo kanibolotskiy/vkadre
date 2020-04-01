@@ -325,7 +325,7 @@ class Profile_table_edit extends Component {
             }
         })
 
-        console.log(this.state)
+        //console.log(this.state)
     }
     handleChangeCurrency(name, value){
         //console.log(event)
@@ -406,11 +406,6 @@ class Profile_table_edit extends Component {
         this.setState({"showConfirm":true})
     }
 
-    /*
-    hideConfirm(){
-        this.setState({"showConfirm":false})
-    }
-    */
     setAnswer(answer){
         sessionStorage.setItem("key_action", "profile_table_edit")
         if(answer){
@@ -473,9 +468,12 @@ class Profile_table_edit extends Component {
                     <div className="itm_caption">{item.title}</div>
                     <CreatableSelect 
                         name={item.name}
-                        value={this.options(item.name).find(op => {
-                            return op.value === this.state.newRecord[item.name+"_id"]
-                        })}
+                        
+                        value={this.state.newRecord[item.name+"_id"]?
+                            this.options(item.name).find(op => {
+                                return op.value === this.state.newRecord[item.name+"_id"]
+                            }):null}
+                            
                         className={"itm_selector "+(this.state.errorRecord[item.name]?"_error":"")}
                         cacheOptions
                         defaultOptions

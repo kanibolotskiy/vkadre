@@ -13,6 +13,7 @@ import {
 from '@devexpress/dx-react-grid-bootstrap4';
 import Loading from '../elements/Loading.js'
 
+
 export default (m_props) => {
   const URL = m_props.url;
   const URL_widths = m_props.url+"_width"
@@ -101,23 +102,6 @@ export default (m_props) => {
 
   /*Порядок колонок */
   const savedCoumnsOrder = () => {
-    /*
-    let column_order=[]
-    let stored_order=null
-    let stored_column_add=JSON.parse(localStorage.getItem(URL_orders))
-    let stored_column_order=stored_column_add?stored_column_add:[]
-    for(let itm in columns){
-        let elem=columns[itm]
-        stored_order=stored_column_order.find(op => {
-          return op.columnName === elem.name
-        })
-        if(stored_order==undefined){
-          stored_order=elem["name"]
-        }
-        column_order.push(stored_order)
-    }
-    console.log(column_order)
-    */
     let column_order=[]
     for(let itm in columns){
       column_order.push(columns[itm]["name"])
@@ -183,59 +167,92 @@ export default (m_props) => {
       setLastQuery(queryString);
     }
   };
-
+  
   useEffect(() => loadData());
 
-  return (
-    <div>
-      <Grid 
-        rows={rows} 
-        columns={columns}
-      >
-        <SelectionState selection={selection} onSelectionChange={setSelection} />
-        <SortingState defaultSorting={[{ columnName: 'id', direction: 'asc' }]} />
-        <DragDropProvider />
-        <IntegratedSelection />
-        <Table  rowComponent={rowClick}  messages={noDataMsg}/>
-        <TableColumnResizing defaultColumnWidths={defaultColumnWidths} onColumnWidthsChange={onChangeColumnWidth} />
-        <IntegratedSorting />
-        <TableHeaderRow showSortingControls/>
-        <TableColumnVisibility
-          defaultHiddenColumnNames={defaultHiddenColumnNames}
-        />
-        <Toolbar />
-        <ColumnChooser />
-        <DateTypeProvider for={dateColumns}/>
-        <CurrencyTypeProvider for={currencyColumns}/>
-        <TableSelection showSelectAll rowComponent={rowClick}/>
-        <TableColumnReordering defaultOrder={columnsOrder} onOrderChange={onChangeColumnOrder}/>
-        {loading && <Loading />}
 
-      </Grid>
-      </div>
-  );
-};
+/*Показывать колонки */
+const savedCoumnsHide = () => {
+  let saved_column_hide=JSON.parse(localStorage.getItem(URL_widths))
+  let stored_column_hide=[]
+  if(saved_column_hide){
+    stored_column_hide=saved_column_hide
+  }
+  
+  //console.log(stored_column_hide)
+  /*let column_hide=[]
+  for(let itm in columns){
+    column_order.push(columns[itm]["name"])
+  }
+  */
+  return stored_column_hide;
+}
+
+//const [columnsOrder,setColumnsOrder] = useState(savedCoumnsOrder);
+const [hiddenColumnNames,setHiddenColumnNames] = useState(savedCoumnsHide);
+/*
+const setHiddenColumnNames = (column) =>{
+  return column
+  console.log(column)
+  //[hiddenColumnNames]=column
+  //hiddenColumnNames.push(column[0])
+  //this.setState({hiddenColumnNames:["dob"]})
+  //..props
+  //console.log(column+"="+value)
+  
+  //localStorage.setItem(URL_hides, JSON.stringify(value));
+}
+
+const onToggle=(event)=>{
+  console.log(event)
+}*/
+const ChooserButton = ({item, disabled,onToggle}) => (
+  <button className={"btn btn_chooser "+(item.hidden?'_hidden':'')}  >
+    <label htmlFor={"chooser_"+item.column.name}>
+      <input onChange={onToggle}  type="checkbox" checked={!item.hidden} id={"chooser_"+item.column.name}/>
+      <div>{item.column.title}</div>
+    </label>
+  </button>
+);
+
+    return (
+      <div>
+        <Grid 
+          rows={rows} 
+          columns={columns}
+        >
+          <SelectionState selection={selection} onSelectionChange={setSelection} />
+          <SortingState defaultSorting={[{ columnName: 'id', direction: 'asc' }]} />
+          <DragDropProvider />
+          <IntegratedSelection />
+          <Table rowComponent={rowClick}  messages={noDataMsg}/>
+          <TableColumnResizing defaultColumnWidths={defaultColumnWidths} onColumnWidthsChange={onChangeColumnWidth} />
+          <IntegratedSorting />
+          <TableHeaderRow showSortingControls/>
+          <TableColumnVisibility
+            hiddenColumnNames={hiddenColumnNames}
+            onHiddenColumnNamesChange={setHiddenColumnNames}
+            //defaultHiddenColumnNames={storeHiddenColumnNames}
+
+            //hiddenColumnNames={hiddenColumnNames}
+            //hiddenColumnNames={["gender"]}
+            //onHiddenColumnNamesChange={setHiddenColumnNames}
+          />
+          <Toolbar />
+          <ColumnChooser itemComponent={ChooserButton} />
+          <DateTypeProvider for={dateColumns}/>
+          <CurrencyTypeProvider for={currencyColumns}/>
+          <TableSelection showSelectAll rowComponent={rowClick}/>
+          <TableColumnReordering defaultOrder={columnsOrder} onOrderChange={onChangeColumnOrder}/>
+          {loading && <Loading />}
+
+        </Grid>
+    </div>
+    )
+}
 
 /*
-columnExtensions={tableColumnExtensions}
-  <SortingState
-    sorting={sorting}
-    onSortingChange={setSorting}
-  />
-  <PagingState
-    currentPage={currentPage}
-    onCurrentPageChange={setCurrentPage}
-    pageSize={pageSize}
-    onPageSizeChange={changePageSize}
-  />
-  <CustomPaging
-    totalCount={totalCount}
-  />
-  <Table
-    columnExtensions={tableColumnExtensions}
-  />
-  <TableHeaderRow showSortingControls />
-  <PagingPanel
-    pageSizes={pageSizes}
-  />
+
+
+
 */
