@@ -3,8 +3,8 @@ import Profile_base from './Profile_base'
 import Profile_table from './Profile_table'
 
 class Profile extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         //Initialize the state in the constructor
         this.state = {
             stateAction:1,
@@ -99,6 +99,7 @@ class Profile extends Component {
         //this.changeState = this.changeState.bind(this)
         this.setAction = this.setAction.bind(this)
         this.addNew = this.addNew.bind(this)
+        this.closeInfo = this.closeInfo.bind(this)
         
 
     }
@@ -134,7 +135,9 @@ class Profile extends Component {
             this.setState({stateAction:2})
         }
     }
-    
+    closeInfo(){
+        this.props.closeInfo()
+    }
     render() { 
 
         const tab_blocks_header = []    //Вкладки профиля
@@ -154,6 +157,7 @@ class Profile extends Component {
                         customerID={this.props.customerID} 
                         stateAction={this.state.stateAction} 
                         setAction={this.setAction}
+                        closeInfo={this.closeInfo}
                         url={item.url}
                         columns={item.columns}
                         sortOrder={item.sortOrder}
@@ -174,7 +178,7 @@ class Profile extends Component {
                         <div className="btn">Печать</div>
                     </div>
                 </div>
-                {this.props.selected==1? <Profile_base customerID={this.props.customerID} />:''}
+                {this.props.selected==1? <Profile_base closeInfo={this.closeInfo} customerID={this.props.customerID} />:''}
                 {block_tables}
             </div>
         )

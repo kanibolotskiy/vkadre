@@ -18,6 +18,7 @@ export default (m_props) => {
   const URL = m_props.url;
   const URL_widths = m_props.url+"_width"
   const URL_orders = m_props.url+"_order"
+  const URL_hides = m_props.url+"_hide"
 
  const rowClick = props => {
   const { value } = props;
@@ -32,19 +33,65 @@ export default (m_props) => {
 
   const [columns] = useState([
     { name: 'id', title: 'ID', width:30 },
-    { name: 'name', title: 'Имя', width:100 },
+    { name: 'fullname', title: 'Имя', width:100 },
     { name: 'dob', title: 'Дата рождения', width:100 },
     { name: 'martial', title: 'Семейное положение', width:100 },
     { name: 'gender', title: 'Пол', width:100 },
     { name: 'mobphone', title: 'Мобильный телефон', width:100 },
     { name: 'phone', title: 'Телефон', width:100 },
+    { name: 'address_reg', title: 'Адрес регистрации', width:100 },
+    { name: 'index_address_reg', title: 'Индекс адреса регистрации', width:100 },
+    { name: 'address_res', title: 'Адрес проживания', width:100 },
+    { name: 'index_address_res', title: 'Индекс адреса проживания', width:100 },
+    { name: 'passport_number', title: 'Серия и номер паспорта', width:100 },
+    { name: 'passport_issuedby', title: 'Кем выдан', width:100 },
+    { name: 'passport_date', title: 'Дата выдачи', width:100 },
+    { name: 'bpl', title: 'Место рождения', width:100 },
+    { name: 'inn', title: 'ИНН налогоплательщика', width:100 },
+    { name: 'insurance_number', title: '№ страхового свидетельства', width:100 },
+    { name: 'medical_number', title: '№ медицинского полюса', width:100 },
+    { name: 'education', title: 'Образование', width:100 },
+    { name: 'education_cap', title: 'Название учебного учреждения', width:100 },
+    { name: 'education_speciality', title: 'Специальность', width:100 },
+    { name: 'status', title: 'Статус', width:100 },
+    { name: 'military_number', title: 'Номер военного билета', width:100 },
+    { name: 'military_place', title: 'Место прохождение службы', width:100 },
+    { name: 'criminal', title: 'Судимость', width:100 },
+    { name: 'criminal_desc', title: 'Статья и срок', width:100 },
+    { name: 'characteristic', title: 'Характеристика', width:100 },
+
+
+    { name: 'subdivision', title: 'Подразделение', width:100 },
+    { name: 'department', title: 'Отдел', width:100 },
+    { name: 'position', title: 'Должность', width:100 },
+    { name: 'custstatus', title: 'Статус сотрудника', width:100 },
+    { name: 'empl_date', title: 'Дата приема на работу', width:100 },
+    { name: 'unempl_date', title: 'Дата увольнения', width:100 },
+
+    { name: 'exp1', title: 'Общий стаж работы', width:100 },
+    { name: 'exp2', title: 'Непрерывный стаж', width:100 },
+    { name: 'exp3', title: 'Стаж работы в компании', width:100 },
+    { name: 'curator', title: 'Куратор сотрудника', width:100 },
+
+    { name: 'salary', title: 'Оклад', width:100 },
+    { name: 'salary_add', title: 'Надбавка в %', width:100 },
+    { name: 'salary_summ', title: 'Оклад с надбавкой', width:100 },
+    { name: 'prize_perc', title: 'Премия в %', width:100 },
+    { name: 'prize', title: 'Премия', width:100 },
+    { name: 'vacation_base', title: 'Основной отпуск', width:100 },
+    { name: 'vacation_add', title: 'Дополнительный отпуск', width:100 },
+    
+  
+
   ]);
 
   const [defaultHiddenColumnNames] = useState(['gender', 'phone']);
   /**Форматирование колонок с датами */
   const [dateColumns] = useState([
-    "dob"
+    "dob","empl_date","unempl_date","exp1","exp2","exp3"
   ]);
+
+
   const DateFormatter = ({ value }) => value?value.replace(/(\d{4})-(\d{2})-(\d{2})/, '$3.$2.$1'):'';
   const DateTypeProvider = props => (
     <DataTypeProvider
@@ -54,7 +101,7 @@ export default (m_props) => {
   );
 
   /**форматирование колонок с ценами */ 
-  const [currencyColumns] = useState([]);
+  const [currencyColumns] = useState(["salary","salary_add","salary_summ","prize"]);
   const CurrencyFormatter = ({ value }) => (
       value?value.toLocaleString('ru-RU')+" Р":''
   );
@@ -173,7 +220,7 @@ export default (m_props) => {
 
 /*Показывать колонки */
 const savedCoumnsHide = () => {
-  let saved_column_hide=JSON.parse(localStorage.getItem(URL_widths))
+  let saved_column_hide=JSON.parse(localStorage.getItem(URL_hides))
   let stored_column_hide=[]
   if(saved_column_hide){
     stored_column_hide=saved_column_hide
@@ -190,6 +237,7 @@ const savedCoumnsHide = () => {
 
 //const [columnsOrder,setColumnsOrder] = useState(savedCoumnsOrder);
 const [hiddenColumnNames,setHiddenColumnNames] = useState(savedCoumnsHide);
+
 /*
 const setHiddenColumnNames = (column) =>{
   return column
@@ -205,11 +253,35 @@ const setHiddenColumnNames = (column) =>{
 
 const onToggle=(event)=>{
   console.log(event)
-}*/
+}
+*/
+const onToggles=(item,func)=>{
+  console.log(item)
+
+  let stored_column_hide=[]
+  //let saved_column_hide=JSON.parse(localStorage.getItem(URL_hides))
+  if(localStorage.getItem(URL_hides)){
+    stored_column_hide=JSON.parse(localStorage.getItem(URL_hides))
+  }
+  let item_name=item.column.name
+  
+  if(!item.hidden){ //добавить
+    stored_column_hide.push(item_name)
+  }else{//удалить
+    var index = stored_column_hide.indexOf(item_name);
+    if (index > -1) {
+      stored_column_hide.splice(index, 1);
+    }
+  }
+  localStorage.setItem(URL_hides, JSON.stringify(stored_column_hide));
+  func()
+
+}
+
 const ChooserButton = ({item, disabled,onToggle}) => (
-  <button className={"btn btn_chooser "+(item.hidden?'_hidden':'')}  >
+  <button className={"btn btn_chooser "+(item.hidden?'_hidden':'')} title={item.column.title} >
     <label htmlFor={"chooser_"+item.column.name}>
-      <input onChange={onToggle}  type="checkbox" checked={!item.hidden} id={"chooser_"+item.column.name}/>
+      <input onChange={()=>onToggles(item,onToggle)}  type="checkbox" checked={!item.hidden} id={"chooser_"+item.column.name}/>
       <div>{item.column.title}</div>
     </label>
   </button>

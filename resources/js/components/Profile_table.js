@@ -13,11 +13,23 @@ class Profile_table extends Component {
         this._editRecord = this._editRecord.bind(this)
         this.setAction = this.setAction.bind(this)
         this.clickRowData = this.clickRowData.bind(this)        
+        this.keyFunction = this.keyFunction.bind(this)        
+        
 
     }
     componentDidMount(){
-        //console.log("ok")
-        //console.log(this.props)
+        sessionStorage.setItem("key_action", "profile_table")
+        document.addEventListener("keydown", this.keyFunction, false);
+    }
+    componentWillUnmount(){
+        document.removeEventListener("keydown", this.keyFunction, false);
+    }
+    keyFunction(event){
+        if(sessionStorage.getItem("key_action")=="profile_table"){
+            if(event.keyCode === 27) {  
+                this.props.closeInfo()
+            }
+        }
     }
     _editRecord(){
         //this.setState({showtable:3})

@@ -14,6 +14,10 @@ use App\Property_education;
 use App\Property_status;
 use App\Property_criminal;
 
+use App\Property_subdivision;
+use App\Property_custstatus;
+use App\Property_department;
+
 
 class PropertyController extends Controller
 {
@@ -28,6 +32,12 @@ class PropertyController extends Controller
         $properties["education"]=Property_education::select('id as value','name as label')->orderBy('name','ASC')->get();
         $properties["status"]=Property_status::select('id as value','name as label')->orderBy('name','ASC')->get();
         $properties["criminal"]=Property_criminal::select('id as value','name as label')->orderBy('name','ASC')->get();
+
+        $properties["subdivision"]=Property_subdivision::select('id as value','name as label')->orderBy('name','ASC')->get();
+        $properties["custstatus"]=Property_custstatus::select('id as value','name as label')->orderBy('name','ASC')->get();
+        $properties["department"]=Property_department::select('id as value','name as label')->orderBy('name','ASC')->get();
+
+
 
         return $properties;
     }

@@ -26,12 +26,23 @@ body{min-width:985px;position:relative;overflow-y: hidden;overflow-x: auto;}
 .wrp_itm_input{position:relative;width:100%;margin-bottom:12px;display:flex;justify-content: space-between;}
 .wrp_itm_input._half{width:48.8%;}
 .wrp_itm_input_devider{line-height: 30px;font-weight: bold;}
-.itm_input{box-sizing: border-box;width:100%;
+.itm_input{
+    box-sizing: border-box;width:100%;
     padding-left:10px;padding-right:10px;
     height:30px;border:1px solid #ddd;background:#fff;
     outline:none;
     transition:0.2s;
 }
+.wrapper_autocomplete{width:100%;}
+.wrapper_autocomplete input{
+    box-sizing: border-box;width:100%;
+    padding-left:10px;padding-right:10px;
+    height:30px;border:1px solid #ddd;background:#fff;
+    outline:none;
+    transition:0.2s;
+
+}
+
 .itm_input._error{border-color:red;}
 
 .itm_input_disabled{background:#eee;}
@@ -288,7 +299,7 @@ height: 50%;width: 1px;top: 25%;}
 }
 .address_hint_line{    padding: 8px 10px;
     border-top: 1px solid #ddd;}
-.address_hint_line:hover{background:#d9ebf5}
+/*.address_hint_line:hover{background:#d9ebf5}*/
 .wrp_profile_info_caption{display:flex;justify-content: space-between;}
 .deleteRow{cursor:pointer;color:#c15800;}
 .deleteRow:hover{color:#085cb7;}
@@ -369,13 +380,14 @@ position: absolute;
     padding:0;
 
 }
-.popover {position:absolute;width:400px;right:0;left:initial!important;
+.popover {position:absolute;width:600px;right:0;left:initial!important;
     background: #fff;
     border: 1px solid #ddd;
     z-index: 101;
 }
 .popover-inner{padding:10px;}
 .popover-inner .py-2{display:flex;justify-content: space-between;flex-wrap:wrap;}
+.popover-inner .py-2:after{content:'';position:relative;width:32%;}
 .dx-g-bs4-column-chooser-item{}
 /**/
 .py-2 .btn_chooser{width:32%;margin-bottom:5px;background:#f8e9b9;padding:2px 0;}
@@ -391,6 +403,14 @@ position: absolute;
     left: 84px;
     margin-top: 2px;
     font-size: 13px;}
+.year_hint_mini {
+    white-space: nowrap;
+    line-height: 28px;
+    position: absolute;
+    left: 84px;
+    margin-top: 3px;
+    font-size: 10px;
+}
 
 .profilePhoto{
     z-index:6;
@@ -433,5 +453,18 @@ position: absolute;
 }
 
 .react-tel-input{width:100%;}
+.suggestion_results{position:absolute;top:30px;left:0;z-index:10;
+    border-left:1px solid #ddd;border-right:1px solid #ddd;
+    box-sizing:border-box;
+    width:100%;}
 
+
+.dx-g-bs4-table{overflow:hidden;}
+
+.dx-g-bs4-header-cell-content{width:100%;}
+.dx-g-bs4-header-cell-content>span{
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 

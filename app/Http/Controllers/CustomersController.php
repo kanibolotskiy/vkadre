@@ -46,11 +46,14 @@ class CustomersController extends Controller
         return Customer::
         leftjoin('property_martials as pm', 'pm.id', '=', 'customers.martial_id')
         ->leftjoin('property_genders as pg', 'pg.id', '=', 'customers.gender_id')
+        ->leftjoin('property_subdivisions as ps', 'ps.id', '=', 'customers.subdivision_id')
+        ->leftjoin('property_custstatuses as pc', 'pc.id', '=', 'customers.custstatus_id')
+        ->leftjoin('property_departments as pd', 'pd.id', '=', 'customers.department_id')
         ->select(
-            'customers.id','customers.dob',
-            'customers.mobphone','customers.phone',
-            'pm.name as martial','pg.name as gender',
-            DB::raw('CONCAT(customers.surname," ",customers.name," ",customers.patronymic) as name'))
+            'customers.*',
+            'pm.name as martial','pg.name as gender','ps.name as subdivision','pc.name as custstatus','pd.name as department',
+
+            DB::raw('CONCAT(customers.surname," ",customers.name," ",customers.patronymic) as fullname'))
         ->get();
     }
     //DATE_FORMAT(customers.dob,"%d.%m.%Y")
@@ -480,6 +483,7 @@ class CustomersController extends Controller
                 $files_str=implode(", ",$file_arr);
             }
             $item["files"]=$files_str;
+            
             $item["files_list"]=File::where('polygraf_id','=',$item->id)->get();
             $returned[]=$item;
         }

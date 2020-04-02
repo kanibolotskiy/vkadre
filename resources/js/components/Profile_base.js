@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import styles from '../styles/style.css';
-import Loader from './elements/Loader.js';
+import Loader from './elements/Loader';
 import Suggestion_item from './elements/Suggestion_item';
+//import Autocomplete  from 'react-autocomplete';
 
 //import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
@@ -78,12 +79,13 @@ class Profile_base extends Component {
             //address_reg_line:[],
             address_lines:[],
             suggestions: [],
-            zoom:false
+            zoom:false,
+            //suggest:[]
             //data: getDataProfile(),
             //rows:setRows
         }
         this._updateInput = this._updateInput.bind(this);
-        this._updateInputPhone = this._updateInputPhone.bind(this);
+        this._updateInputName = this._updateInputName.bind(this);
         this._delPhoto = this._delPhoto.bind(this);
         this.zoomPhoto = this.zoomPhoto.bind(this);
         
@@ -102,31 +104,7 @@ class Profile_base extends Component {
         this._enter = this._enter.bind(this);
         this._esc = this._esc.bind(this);
         
-
-        /*
-        this.onChange = this.onChange.bind(this);
-        this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
-        this.onSuggestionsClearRequested = this.onSuggestionsClearRequested.bind(this);
-        */
-
     }
-
-    /*
-    onChange (event, { newValue, method }) {
-    //onChange = (event, { newValue, method }) => {    
-        this.setState({ value: newValue });
-    }
-      
-    onSuggestionsFetchRequested  ({ value }) {
-    fetch(`https://swapi.co/api/people/?search=${value}`)
-        .then(response => response.json())
-        .then(data => this.setState({ suggestions: data.results }))
-    }
-
-    onSuggestionsClearRequested ()  {
-        this.setState({ suggestions: [] });
-    };
-    */
 
     zoomPhoto(flag){
         if(flag){
@@ -146,9 +124,7 @@ class Profile_base extends Component {
         }
         return dictionart_array
     }
-    componentWillUnmount(){
-        document.removeEventListener("keydown", this.keyFunction, false);
-    }
+    
     componentDidMount() {
         this._loadAsyncData(this.props.customerID);
         sessionStorage.setItem("key_action", "profile_base")
@@ -161,7 +137,8 @@ class Profile_base extends Component {
                 this._esc()
             }
             if(event.keyCode === 13) {
-                this.addRecord()
+                console.log(event)
+                //this.addRecord()
             }
         }
     }
@@ -172,6 +149,8 @@ class Profile_base extends Component {
             const data_changed=(JSON.stringify(this.state.newRecord)===JSON.stringify(this.state.oldRecord));
             if(data_changed){//Выход наружу
                 //this.props.setAction(1)  
+                this.props.closeInfo()
+
             }else{//Отмена изменений
                 let data=this.state.oldRecord
                 this.setState({data:data})
@@ -182,9 +161,8 @@ class Profile_base extends Component {
         }
     }
     _enter(){
-        //console.log(this.state.data)
-        //console.log(this.state.data)
-       
+        
+        /*
         fetch('/api/customers/'+this.props.customerID, {
                 method: 'PUT',
                 body: JSON.stringify(this.state.newRecord),
@@ -198,6 +176,7 @@ class Profile_base extends Component {
                 //console.log(data)
             })
         
+        */
 
     }
 
@@ -208,24 +187,18 @@ class Profile_base extends Component {
         }
     }
     componentWillUnmount() {
+        document.removeEventListener("keydown", this.keyFunction, false);
         if (this._asyncRequest) {
             this._asyncRequest.cancel();
         }
     }
     _loadAsyncData(customerID) {
-        //console.log("fetch")
-        
         fetch('/api/customers/'+customerID)
             .then(response => response.json())
             .then((response)=>{
-                //this.setState({data:response})
                 this.setState({data:response})
-                
-
                 this.setTableData()
-                //console.log(this.state.newRecord["martial_id"])
-            })
-        
+            })    
     }
     /*-----------------------------------------------------------------------------*/
     declOfNum(number, titles)
@@ -236,7 +209,7 @@ class Profile_base extends Component {
     setTableData(){
         
         let data=this.state.data
-        console.log(data)
+        //console.log(data)
 
         let newRecordDates=[]
         let newRecordDatesName=[]
@@ -282,7 +255,7 @@ class Profile_base extends Component {
         var a = moment();   
         var b = moment(date);
         var b_formatted=b.format("YYYY-MM-DD")
-        console.log(b_formatted)
+        //console.log(b_formatted)
         var f_years = a.diff(b, 'year');
         //console.log(f_years)
 
@@ -310,7 +283,8 @@ class Profile_base extends Component {
         })
     }
 
-    _updateInputPhone(name,value){
+    _updateInputName(name,value){
+        //console.log(name+"="+value)
         this.setState({
             newRecord:{
                 ...this.state.newRecord,
@@ -327,82 +301,20 @@ class Profile_base extends Component {
         })
     }
 
-    _updateAddress(event){
-        const target = event.target;
-
+    _updateAddress(name,item){
+        
         this.setState({
             newRecord:{
                 ...this.state.newRecord,
-                [target.name]: target.value,
-            }
-        })
-        
-        fetch('https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address', {
-            method: 'POST',
-            body: JSON.stringify({ "query": target.value, "count": 10 }),
-            headers: {
-                'Authorization': 'Token 3bfe37ae8dd1e98a6ea74382d7b263fca50a58b2', 
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-        })
-        .then(response => response.json())
-        .then((data)=>{
-            let lines_name=target.name+"_line"
-            //this.setState({[lines_name]:data.suggestions})
-
-            this.setState({
-                address_lines:{
-                    ...this.state.address_lines,
-                    key_address:lines_name,
-                    data_address:data.suggestions,
-                }
-            })
-            //address_lines[]
-        })
-        //console.log(this.state)
-    }
-    /*
-    choiseAddress(key){
-        console.log(key)
-        let address_arr=this.state.address_lines.data_address
-        let address_itm=address_arr[key]
-        this.setState({
-            newRecord:{
-                ...this.state.newRecord,
-                address_reg: address_itm.value,
-                index_address_reg:address_itm.data.postal_code!=null?address_itm.data.postal_code:""
+                [name]: item.value,
+                ["index_"+name]: item.data.postal_code?item.data.postal_code:""
+                //address_reg:"test",
+                //index_address_reg:"test",
+                //item.value
             }
         })
     }
-    _addressBlur(event){
-        
-        this.setState({
-            address_lines:{
-                ...this.state.address_lines,
-                key_address:"",
-                data_address:[],
-            }
-        })    
-    }
-    _handleKeyDown(e){
-        let newRecord=this.state.newRecord
-        if (e.key === 'Enter') {
-            this.setState({
-                address_lines:{
-                    ...this.state.address_lines,
-                    key_address:"",
-                    data_address:[],
-                }
-            })
-        }
-        if(e.key==='ArrowDown'){
-
-        }
-        //console.log(e.key)
-        
-    }
-*/
+   
     _updateSelect(newValue, actionMeta){
         let new_value=null
         let newRecord=this.state.newRecord
@@ -451,13 +363,9 @@ class Profile_base extends Component {
                                         return op.value === this.state.newRecord["martial"]
                                     })}
 
-
-
-<Suggestion_item />
-
  */
 
-    
+
     render() { 
         const data_changed=(JSON.stringify(this.state.newRecord)===JSON.stringify(this.state.oldRecord));            
         let data_address_lines=[]
@@ -542,7 +450,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                                 country={'ru'}
                                 
                                 value={this.state.newRecord.mobphone}
-                                onChange={(phone)=>this._updateInputPhone("mobphone",phone)}
+                                onChange={(phone)=>this._updateInputName("mobphone",phone)}
                             />
                         </div>
                     </div>
@@ -554,7 +462,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                                 country={'ru'}
                                 
                                 value={this.state.newRecord.phone}
-                                onChange={(phone)=>this._updateInputPhone("phone",phone)}
+                                onChange={(phone)=>this._updateInputName("phone",phone)}
                             />
                         </div>
                     </div>
@@ -629,15 +537,12 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                     <div className="col2">
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Адрес регистрации</div>
-                            <input 
+                            <Suggestion_item 
                                 value={this.state.newRecord.address_reg} 
-                                onKeyDown={this._handleKeyDown} 
-                                onBlur={this._addressBlur} 
-                                autoComplete="new-password" 
-                                onChange={this._updateAddress} 
+                                onSelect={this._updateAddress} 
+                                onChange={this._updateInputName} 
                                 name="address_reg" 
-                                type="text" 
-                                className="itm_input" />
+                            />
                         </div>
 
                         {data_address_lines["address_reg_line"]?
@@ -654,6 +559,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Индекс адреса регистрации</div>
                             <input type="text" className="itm_input" 
+                                autoComplete="new-password"
                                 value={this.state.newRecord.index_address_reg} 
                                 name="index_address_reg" 
                                 onChange={this._updateInput} 
@@ -665,15 +571,11 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                     <div className="col2">
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Адрес проживания</div>
-                            <input 
+                            <Suggestion_item 
                                 value={this.state.newRecord.address_res} 
-                                onKeyDown={this._handleKeyDown} 
-                                onBlur={this._addressBlur} 
-                                autoComplete="new-password" 
-                                onChange={this._updateAddress} 
+                                onSelect={this._updateAddress} 
+                                onChange={this._updateInputName} 
                                 name="address_res" 
-                                type="text" 
-                                className="itm_input"
                             />
                         </div>
                         {data_address_lines["address_res_line"]?
@@ -689,6 +591,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Индекс адреса проживания</div>
                             <input type="text" className="itm_input" 
+                                autoComplete="new-password"
                                 value={this.state.newRecord.index_address_res} 
                                 name="index_address_res" 
                                 onChange={this._updateInput} 

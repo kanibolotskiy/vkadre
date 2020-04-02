@@ -137,6 +137,7 @@ class Profile_table_edit extends Component {
             //Расставляем элементы для формы
             if(this.props.action==2){
                 newRecord[elem.name]=""
+                newRecord["files_list"]=[]
             }else{
                 //console.log(elem.type)
                 switch (elem.type){
@@ -156,7 +157,6 @@ class Profile_table_edit extends Component {
                         }
                     break;
                     case "double_date":
-                        console.log(this.props.rowData)
                         if(this.props.rowData[elem.name+"_from"]){
                             let date_arr=this.props.rowData[elem.name+"_from"].split("-");
                             let date_value=new Date(date_arr[0],(date_arr[1]*1-1),date_arr[2])
@@ -175,6 +175,11 @@ class Profile_table_edit extends Component {
                         }
                         
                     break;
+                    /*
+                    case "files":
+                        console.log(this.props.rowData)
+                    break;
+                    */
                     default:
                         newRecord[elem.name]=this.props.rowData[elem.name]?this.props.rowData[elem.name]:""
                 }
@@ -515,19 +520,28 @@ class Profile_table_edit extends Component {
                     </div>)
                 :''
                 */
-                console.log(this.props.rowData[item.name+"_list"])
+                //console.log(this.props.rowData[item.name+"_list"])
                 
-                return <div className="wrp_itm_input">
-                    <div className="itm_caption">{item.title}</div>
-                    <div className="files_list">
-                        {this.props.rowData[item.name+"_list"].map((item,key)=>
+
+/*
+
+                        
+{this.props.rowData[item.name+"_list"].map((item,key)=>
                             <div className="file_row" key={key}>
                                 <div className="file_row_caption"><a href={item.file_path}>{item.file_name}</a></div>
                                 <div className="file_row_del">Удалить</div>
                             </div>
                         )}
+*/
+//console.log(this.props.rowData);
+                return <div className="wrp_itm_input">
+                    <div className="itm_caption">{item.title}</div>
+                    <div class="wrp_files_list">
+                        <div className="files_list">                      
+                            
+                        </div>
+                        <input type="file" name="file" onChange={this.handleChangeFile}/>
                     </div>
-                    <input type="file" name="file" onChange={this.handleChangeFile}/>
                     
                 </div>
             break;

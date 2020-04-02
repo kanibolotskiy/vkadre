@@ -29,8 +29,9 @@ class Customers extends Component {
         //this.escFunction = this.escFunction.bind(this)
         this.showProfile = this.showProfile.bind(this)
         this.keyFunction = this.keyFunction.bind(this)
+        this.closeInfo = this.closeInfo.bind(this)
+    
         
-
     }
     componentDidMount(){
         sessionStorage.setItem("key_action", "customers")
@@ -74,7 +75,11 @@ class Customers extends Component {
             this.setState({stateActive:1})
         }
         //
-
+    }
+    closeInfo(){
+        //console.log("closeInfo_cust")
+        this.setState({customerID:0})
+        this.setState({stateActive:0})
     }
     render() {
         return (
@@ -105,11 +110,11 @@ class Customers extends Component {
                             <div onClick={()=>this.setInfo(5)} className={this.state.stateActive==5? 'active':''}>Посещения</div>
                         </div>
                         
-                        {this.state.stateActive==1? <Profile customerID={this.state.customerID} selected={this.state.stateSelected.stateActiveProfile} updateData = {this.updateData}/>:''}
-                        {this.state.stateActive==2? <Organization customerID={this.state.customerID} selected={this.state.stateSelected.stateActiveOrganization} updateData = {this.updateData}/>:''}
-                        {this.state.stateActive==3? <Links customerID={this.state.customerID} updateData = {this.updateData}/>:''}
-                        {this.state.stateActive==4? <Polygraf customerID={this.state.customerID} updateData = {this.updateData}/>:''}
-                        {this.state.stateActive==5? <Visit customerID={this.state.customerID} updateData = {this.updateData}/>:''}
+                        {this.state.stateActive==1? <Profile closeInfo={this.closeInfo} customerID={this.state.customerID} selected={this.state.stateSelected.stateActiveProfile} updateData = {this.updateData}/>:''}
+                        {this.state.stateActive==2? <Organization closeInfo={this.closeInfo} customerID={this.state.customerID} selected={this.state.stateSelected.stateActiveOrganization} updateData = {this.updateData}/>:''}
+                        {this.state.stateActive==3? <Links closeInfo={this.closeInfo} customerID={this.state.customerID} updateData = {this.updateData}/>:''}
+                        {this.state.stateActive==4? <Polygraf closeInfo={this.closeInfo} customerID={this.state.customerID} updateData = {this.updateData}/>:''}
+                        {this.state.stateActive==5? <Visit closeInfo={this.closeInfo} customerID={this.state.customerID} updateData = {this.updateData}/>:''}
                     </div>
                 :''}
             </div>
