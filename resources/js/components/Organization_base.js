@@ -356,10 +356,17 @@ class Organization_base extends Component {
                             <div className="itm_caption">Подразделение</div>
                             <CreatableSelect 
                                     name="subdivision"
+                                    
+                                    value={
+                                    this.options("subdivision").find(op => {
+                                        return op.value === this.state.newRecord["subdivision_id"]
+                                    })}
+                                    /*
                                     value={this.state.newRecord["subdivision_id"]?
                                     this.options("subdivision").find(op => {
                                         return op.value === this.state.newRecord["subdivision_id"]
                                     }):null}
+                                    */
 
                                     className="itm_selector"
                                     cacheOptions
@@ -379,10 +386,16 @@ class Organization_base extends Component {
                             <div className="itm_caption">Отдел</div>
                             <CreatableSelect 
                                 name="department"
+                                value={
+                                this.options("department").find(op => {
+                                    return op.value === this.state.newRecord["department_id"]
+                                })}
+                                /*
                                 value={this.state.newRecord["department_id"]?
                                 this.options("department").find(op => {
                                     return op.value === this.state.newRecord["department_id"]
                                 }):null}
+                                */
 
                                 className="itm_selector"
                                 cacheOptions
@@ -415,10 +428,16 @@ class Organization_base extends Component {
                             <div className="itm_caption">Статус сотрудника</div>
                             <CreatableSelect 
                                 name="custstatus"
+                                value={
+                                this.options("custstatus").find(op => {
+                                    return op.value === this.state.newRecord["custstatus_id"]
+                                })}
+                                /*
                                 value={this.state.newRecord["custstatus_id"]?
                                 this.options("custstatus").find(op => {
                                     return op.value === this.state.newRecord["custstatus_id"]
                                 }):null}
+                                */
 
                                 className="itm_selector"
                                 cacheOptions

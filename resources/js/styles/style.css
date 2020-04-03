@@ -100,7 +100,8 @@ header{padding:10px;border-bottom:1px solid #ddd;}
 .property_item_row{position:relative;display:flex;margin-top: 5px;margin-bottom: 5px;}
 .property_item{width:300px;padding-left:5px;padding-right:5px;line-height: 26px;outline:none;border:1px solid #ddd;padding-top:0;padding-bottom:0;}
 
-.del_dictionary_itm_val{line-height: 24px;padding-left: 10px;font-size: 12px;color: #085cb7;cursor:pointer;}
+.del_dictionary_itm{display:none;}
+.del_dictionary_itm_val{line-height: 28px;padding-left: 10px;font-size: 12px;color: #085cb7;cursor:pointer;}
 .dictonary_buttons{height:60px;position:absolute;bottom:0;width:100%;left:0;border-top:1px solid #ddd;
 }
 .dictonary_buttons_info{padding-left:15px;padding-right:15px;display:flex;justify-content: space-between;    height: 100%;align-items: center;}
@@ -467,4 +468,12 @@ position: absolute;
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.property_item_row:hover .del_dictionary_itm{display:block;}
 
+
+.profile_info_dict {
+    height: calc(100vh - 48px);
+}
+
+.properties_subitem{cursor:pointer;}
+.properties_subitem.active,.properties_subitem:hover{background:#d9ebf5;}

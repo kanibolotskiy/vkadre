@@ -490,10 +490,17 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                             <div className="itm_caption">Семейное положение</div>
                             <CreatableSelect 
                                 name="martial"
+                                value={
+                                this.options("martial").find(op => {
+                                    return op.value === this.state.newRecord["martial_id"]
+                                })}
+
+                                /*
                                 value={this.state.newRecord["martial_id"]?
                                 this.options("martial").find(op => {
                                     return op.value === this.state.newRecord["martial_id"]
                                 }):null}
+                                */
 
                                 className="itm_selector"
                                 cacheOptions
@@ -513,11 +520,17 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                             <div className="itm_caption">Пол</div>
                             <CreatableSelect 
                                 name="gender"
-                                
+
+                                value={
+                                this.options("gender").find(op => {
+                                    return op.value === this.state.newRecord["gender_id"]
+                                })}
+                                /*
                                 value={this.state.newRecord["gender_id"]?
                                 this.options("gender").find(op => {
                                     return op.value === this.state.newRecord["gender_id"]
                                 }):null}
+                                */
 
                                 className="itm_selector"
                                 cacheOptions
@@ -694,6 +707,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                             <div className="itm_caption">Образование</div>
                             <CreatableSelect 
                                 name="education"
+                                
                                 value={this.options("education").find(op => {
                                     //console.log(this.state.newRecord)
                                     return op.value === this.state.newRecord["education_id"]
@@ -740,11 +754,18 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                             <div className="itm_caption">Статус</div>
                             <CreatableSelect 
                                 name="status"
-                                
+
+                                value={
+                                this.options("status").find(op => {
+                                    return op.value === this.state.newRecord["status_id"]
+                                })}
+
+                                /*
                                 value={this.state.newRecord["status_id"]?
                                 this.options("status").find(op => {
                                     return op.value === this.state.newRecord["status_id"]
                                 }):null}
+                                */
 
                                 className="itm_selector"
                                 cacheOptions
@@ -788,10 +809,17 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                             <div className="itm_caption">Судимость</div>
                             <CreatableSelect 
                                 name="criminal"
+
+                                value={
+                                this.options("criminal").find(op => {
+                                    return op.value === this.state.newRecord["criminal_id"]
+                                })}
+                                /*
                                 value={this.state.newRecord["criminal_id"]?
                                 this.options("criminal").find(op => {
                                     return op.value === this.state.newRecord["criminal_id"]
                                 }):null}
+                                */
 
                                 className="itm_selector"
                                 cacheOptions

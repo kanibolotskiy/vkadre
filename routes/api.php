@@ -103,6 +103,24 @@ Route::delete('customer_polygraf/{polygraf}', 'CustomersController@polygraf_dele
 
 /**Словари */
 Route::get('properties/', 'PropertyController@index');
+Route::get('properties/{property}/', 'PropertyController@property_index');
+Route::post('properties/{property}/','PropertyController@property_update');
+Route::delete('properties/{property}/{property_id}', 'PropertyController@property_delete');
+
+/*
+Route::delete('properties/martial/{martial}', 'PropertyController@martial_delete');
+Route::post('properties/martial/','PropertyController@martial_update');
+
+Route::delete('properties/gender/{gender}', 'PropertyController@gender_delete');
+Route::post('properties/gender/','PropertyController@gender_update');
+
+
+Route::delete('properties/education/{education}', 'PropertyController@education_delete');
+Route::post('properties/education/','PropertyController@education_update');
+
+Route::delete('properties/criminal/{criminal}', 'PropertyController@criminal_delete');
+Route::post('properties/criminal/','PropertyController@criminal_update');
+*/
 
 /**Сотрудники для селектора */
 Route::get('customers_select/{searchParam?}', 'CustomersController@customers_select');

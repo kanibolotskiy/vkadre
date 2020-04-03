@@ -8,7 +8,7 @@ import AsyncCreatableSelect from 'react-select/async-creatable';
 import AsyncSelect from 'react-select/async';
 
 import Highlighter from 'react-highlight-words';
-import Confirm from '../components/elements/Confirm'
+import Confirm from '../components/elements/Confirm';
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru)
 
@@ -474,10 +474,15 @@ class Profile_table_edit extends Component {
                     <CreatableSelect 
                         name={item.name}
                         
-                        value={this.state.newRecord[item.name+"_id"]?
+                        value={
+                            this.options(item.name).find(op => {
+                                return op.value === this.state.newRecord[item.name+"_id"]
+                            })}
+                        /*value={this.state.newRecord[item.name+"_id"]?
                             this.options(item.name).find(op => {
                                 return op.value === this.state.newRecord[item.name+"_id"]
                             }):null}
+                        */
                             
                         className={"itm_selector "+(this.state.errorRecord[item.name]?"_error":"")}
                         cacheOptions

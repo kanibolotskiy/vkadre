@@ -17,6 +17,21 @@ class Properties extends Component {
         this.state = {
             stateActive:0,
             products: [],
+            dictionaries:[
+                {key:"martial",caption:"Семейное положение"},
+                {key:"gender",caption:"Пол"},
+                {key:"education",caption:"Образование"},
+                {key:"status",caption:"Статус"},
+                {key:"criminal",caption:"Судимость"},
+                {key:"subdivision",caption:"Подразделение"},
+                {key:"department",caption:"Отдел"},
+                {key:"custstatus",caption:"Статус сотрудника"},
+                {key:"typeproperty",caption:"Тип имущества"},
+                {key:"typecredit",caption:"Тип кредита"},
+                {key:"typevacation",caption:"Тип отпуска"},
+                {key:"typelink",caption:"Тип связи"},
+
+            ]
         }
     }
     setInfo(stateActive){
@@ -24,6 +39,22 @@ class Properties extends Component {
     }
     render() {
         //<div onClick={()=>this.setInfo(1)} className="properties_item">Конструктор карточки</div>
+        let dictionary_captions=[]
+        let dictionary_comp=''
+        /*
+        this.state.dictionaries.map((item,key)=>{
+            dictionary_captions.push(
+                <div key={key} onClick={()=>this.setInfo(item.key)} className={"properties_subitem"+(item.key==this.state.stateActive?" active":"")}>{item.caption}</div>
+            )
+            if(item.key==this.state.stateActive){
+                dictionary_comp=<Dictionary caption={item.caption} url={item.key} />
+            }
+
+        })
+
+        {dictionary_captions}
+        */
+
         return (
             <div className="wrapper">
                 <Header/>
@@ -36,20 +67,16 @@ class Properties extends Component {
                                 <div onClick={()=>this.setInfo(3)} className="properties_item">Роли и доступы</div>
                                 <div onClick={()=>this.setInfo(4)} className="properties_item">Общие настройки</div>
                                 <div onClick={()=>this.setInfo(5)} className="properties_item _caption" >Настройка справочников</div>
-                                <div onClick={()=>this.setInfo(6)} className="properties_subitem">Семейное положение</div>
-                                <div onClick={()=>this.setInfo(7)} className="properties_subitem">Пол</div>
-                                <div onClick={()=>this.setInfo(8)} className="properties_subitem">Образование</div>
-                                <div onClick={()=>this.setInfo(9)} className="properties_subitem">Статус</div>
-                                <div onClick={()=>this.setInfo(10)} className="properties_subitem">Судимость</div>
+                                {this.state.dictionaries.map((item,key)=>{
+                                    return <div key={key} onClick={()=>this.setInfo(item.key)} className={"properties_subitem"+(item.key==this.state.stateActive?" active":"")}>{item.caption}</div>
+                                })}
                             </div>
                         </div>
                         <div className="properties_content">
                             <div className="properties_info">
-
-                                {this.state.stateActive==6?<Dictionary caption="Семейное положение" url="martial"/>:''}
-                                {this.state.stateActive==7?<Dictionary caption="Пол" url="gender"/>:''}
-                                {this.state.stateActive==8?<Dictionary caption="Образование" url="education"/>:''}
-                                {this.state.stateActive==9?<Dictionary caption="Статус" url="status"/>:''}
+                                {this.state.dictionaries.map((item,key)=>{
+                                    return this.state.stateActive==item.key?<Dictionary caption={item.caption} url={item.key}/>:''
+                                })}
                             </div>
                         </div>
                     </div>
