@@ -7,6 +7,7 @@ class Profile_table extends Component {
         super(props);
         this.state = {
             stateAction:this.props.stateAction,
+            //flagUpdate:false,
             //columns_order:['date','record','base'],
             columns_sort:[{ columnName: 'id', direction: 'ASC' }],
         }
@@ -51,16 +52,20 @@ class Profile_table extends Component {
     render() { 
         return (
             <div>                
-                <div style={{display: this.props.stateAction==1 ? 'block' : 'none' }}>
+                {this.props.stateAction==1?
+                
                     <FlexigridItem 
                         customerID={this.props.customerID}
                         url={this.props.url}
                         columns={this.props.columns}
                         clickRowData={this.clickRowData}
+                        updateData={this.flagUpdate}
+                        setUpdateData={this.setUpdateData}
                         //columns_order={this.state.columns_order}
                         //columns_sort={this.state.columns_sort}
                     />
-                </div>
+                :''}
+                
                 {this.props.stateAction>1?
                     <Profile_table_edit 
                         action={this.props.stateAction}

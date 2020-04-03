@@ -34,8 +34,8 @@ class CustomersController extends Controller
         $out["order"]="ASC";
         if(isset($output["sort"])){
             $sort_arr=json_decode($output["sort"],TRUE);
-            $out["selector"]=$sort_arr[0]["selector"];
-            $out["order"]=$sort_arr[0]["order"];
+            $out["selector"]=$sort_arr[0]["columnName"];
+            $out["order"]=$sort_arr[0]["direction"];
         }
         return $out;
     }

@@ -71,7 +71,7 @@ const promiseOptions = inputValue => {
     //}else{
     //    return []
     //}
-  };
+};
 class Profile_table_edit extends Component {
     constructor(props) {
         
@@ -397,7 +397,6 @@ class Profile_table_edit extends Component {
             }
         })
         this.setState({errorRecord})
-        console.log(this.state)
     }
     options(selector){
         let dictionart_array=[];
@@ -503,7 +502,7 @@ class Profile_table_edit extends Component {
                     <AsyncSelect
                         name={item.name}
                         className={"itm_selector "+(this.state.errorRecord[item.name]?"_error":"")}
-                        value={{value:this.state.newRecord[item.name+"_id"],label:this.state.newRecord[item.name]}}
+                        value={{value:this.state.newRecord[item.name+"_id"],label:this.state.newRecord[item.name+"_name"]}}
                         styles={customStyles}
                         formatOptionLabel={formatOptionLabel}
                         placeholder={" - введите - "}
@@ -541,7 +540,7 @@ class Profile_table_edit extends Component {
 //console.log(this.props.rowData);
                 return <div className="wrp_itm_input">
                     <div className="itm_caption">{item.title}</div>
-                    <div class="wrp_files_list">
+                    <div className="wrp_files_list">
                         <div className="files_list">                      
                             
                         </div>

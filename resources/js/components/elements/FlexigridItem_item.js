@@ -15,6 +15,7 @@ export default (m_props) => {
   const URL = "api/" + m_props.url + "/";
   const URL_orders = m_props.url + "_orders";
   const URL_widths = m_props.url + "_widths";
+  const URL_sorts = m_props.url + "_sorts";
 
   /**/
   const rowClick = props => {
@@ -32,8 +33,9 @@ export default (m_props) => {
   
   const [rows, setRows] = useState([]); 
 
-  //const [sorting, setSorting] = useState([{ columnName: 'name', direction: 'asc' }]);
-  const [sorting, setSorting] = useState([])
+  //
+  
+  //const [sorting, setSorting] = useState([])
   const [selection, setSelection] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -44,6 +46,23 @@ export default (m_props) => {
   //const [columnOrder, setColumnOrder] = useState([]);
   //const url = "api/"+this.props.url
   
+
+  /*Сортировка колонок*/
+  const savedCoumnsSort = () => {
+    let storageColumnsSort=localStorage.getItem(URL_sorts)
+    let column_sort=[]    
+    if(storageColumnsSort){
+      column_sort=JSON.parse(storageColumnsSort)
+    }else{
+      for(let itm in m_props.columns){
+        let elem=m_props.columns[itm]
+        column_sort.push({columnName:elem["columnName"],sort:elem["order"]})
+      }
+    }
+    return column_sort
+  }
+  const [sorting, setSorting] = useState(savedCoumnsSort);
+
 
   /*Ширина колонок*/
   const savedCoumnsWidth = () => {
@@ -135,12 +154,25 @@ export default (m_props) => {
     if (sorting.length) {
       const sortingConfig = sorting
         .map(({ columnName, direction }) => ({
+          columnName: columnName,
+          direction: direction,
+        }));
+      /*
+        .map(({ columnName, direction }) => ({
           selector: columnName,
           order: direction,
         }));
-        console.log(sortingConfig)
+      */
+
+        //console.log(sortingConfig)
+      //const [sorting, setSorting] = useState([{ columnName: 'name', direction: 'asc' }]);
+      //[{"selector":"record","order":"asc"}]
+      //let sort_arr=[{columnName:sortingConfig["selector"],direction:sortingConfig["order"]}]
+      //console.log(sort_arr)
+      localStorage.setItem(URL_sorts, JSON.stringify(sortingConfig));
+
       const sortingStr = JSON.stringify(sortingConfig);
-      console.log(sortingStr)
+      //console.log(sortingStr)
       queryString = `${queryString}&sort=${escape(`${sortingStr}`)}`;
     }
     return queryString;

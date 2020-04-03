@@ -5,6 +5,7 @@ import Loader from './elements/Loader';
 import CurrencyInput from 'react-currency-input';
 import CreatableSelect from 'react-select/creatable';
 import Highlighter from 'react-highlight-words';
+import AsyncSelect from 'react-select/async';
 
 import DatePicker, { registerLocale } from 'react-datepicker'
 import ru from 'date-fns/locale/ru';
@@ -18,6 +19,11 @@ function formatOptionLabel ({label}, {inputValue}) {
       />
     );
 }
+const promiseOptions = inputValue => {
+    const url = `api/customers_select/${inputValue ? '?searchParam=' + inputValue : ''}`;
+    return fetch(url)
+            .then(response => response.json()) // my option list array?
+};
 const customStyles = {
     option: (provided, state) => ({
       ...provided,
@@ -78,10 +84,44 @@ class Organization_base extends Component {
         this.handleChangeCurrency = this.handleChangeCurrency.bind(this)
         this.handleKeyPress = this.handleKeyPress.bind(this)
         this.handleChangePercent = this.handleChangePercent.bind(this)
+        this.handleChangeSelect = this.handleChangeSelect.bind(this)
 
         this._esc = this._esc.bind(this)
         
 
+    }
+    handleChangeSelect(newValue, actionMeta){
+        console.log(newValue)
+        console.log(actionMeta)
+        let new_value=null
+        //let newRecord=this.state.newRecord
+        //let errorRecord=this.state.errorRecord
+
+        let select_value_id=null
+        //let select_value_name=null
+
+        switch (actionMeta.action){
+            case "select-option":
+                select_value_id=newValue.value
+                //errorRecord[actionMeta.name]=false
+            break;
+            case "create-option":
+                select_value_name=newValue.value
+                //errorRecord[actionMeta.name]=false
+            break;
+            case "clear":
+            break;
+            default:
+        }
+        //this.setState({newRecord})
+        this.setState({
+            newRecord:{
+                ...this.state.newRecord,
+                [actionMeta.name+"_id"]: select_value_id,
+                //[actionMeta.name+"_name"]: select_value_name
+            }
+        })
+        this.setState({errorRecord})
     }
     options(selector){
         let dictionart_array=[];
@@ -524,7 +564,20 @@ class Organization_base extends Component {
                     <div className="col">
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Куратор сотрудника</div>
-                            <input type="text" className="itm_input" />
+                            <AsyncSelect
+                                name={this.state.newRecord.curator}
+                                className="itm_selector"
+                                value={{value:this.state.newRecord["curator_id"],label:this.state.newRecord["curator"]}}
+                                styles={customStyles}
+                                formatOptionLabel={formatOptionLabel}
+                                placeholder={" - введите - "}
+                                isClearable
+                                cacheOptions
+                                loadOptions={promiseOptions}
+                                defaultOptions
+                                //onInputChange={this.handleInputChange}
+                                onChange={this.handleChangeSelect}
+                            />
                         </div>
                     </div>
                 </div>
