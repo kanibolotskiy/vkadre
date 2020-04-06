@@ -124,7 +124,7 @@ class CustomersController extends Controller
             $filename       = $file->getClientOriginalName();
             $destinationPath = public_path('/uploads/photo/'.$customer->id."/");
             $uploadValue     = $file->move($destinationPath, $filename);
-            $customer->photo=$destinationPath.$filename;
+            $customer->photo='/uploads/photo/'.$customer->id."/".$filename;
             //DB::insert('insert into files (polygraf_id,file_path,file_name) values (?,?,?)',[$polygraf->id,$destinationPath,$filename]);  
         }
 
