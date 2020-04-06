@@ -67,6 +67,7 @@ class Organization_base extends Component {
         super();
         //Initialize the state in the constructor
         this.state = {
+            customerID:-1,
             loading:true,
             data:[],
             newRecordDatesName:[],
@@ -78,21 +79,55 @@ class Organization_base extends Component {
         this._updateSelect = this._updateSelect.bind(this);
         
 
-        this._loadAsyncData = this._loadAsyncData.bind(this);
+        //this._loadAsyncData = this._loadAsyncData.bind(this);
         this.keyFunction = this.keyFunction.bind(this);
         this.setTableData = this.setTableData.bind(this);
         this.handleChangeCurrency = this.handleChangeCurrency.bind(this)
         this.handleKeyPress = this.handleKeyPress.bind(this)
         this.handleChangePercent = this.handleChangePercent.bind(this)
         this.handleChangeSelect = this.handleChangeSelect.bind(this)
+        this.handleChangeSelectAcync = this.handleChangeSelectAcync.bind(this)
+        
 
         this._esc = this._esc.bind(this)
+        this._enter = this._enter.bind(this)
         
 
     }
+    handleChangeSelectAcync(newValue, actionMeta){
+        let new_value=null
+        let select_value_id=null
+        let select_value_name=null
+
+        //console.log(newValue)
+        //console.log(actionMeta)
+        
+        switch (actionMeta.action){
+            case "select-option":
+                select_value_id=newValue.value
+                select_value_name=newValue.label
+            break;
+            /*case "create-option":
+                select_value_name=newValue.value
+            break;
+            */
+            case "clear":
+            break;
+            default:
+        }
+        //console.log(actionMeta.name+"="+select_value_id+"="+select_value_name)
+        this.setState({
+            newRecord:{
+                ...this.state.newRecord,
+                [actionMeta.name+"_id"]: select_value_id,
+                [actionMeta.name]: select_value_name
+            }
+        })
+    }
+
     handleChangeSelect(newValue, actionMeta){
-        console.log(newValue)
-        console.log(actionMeta)
+        //console.log(newValue)
+        //console.log(actionMeta)
         let new_value=null
         //let newRecord=this.state.newRecord
         //let errorRecord=this.state.errorRecord
@@ -121,7 +156,7 @@ class Organization_base extends Component {
                 //[actionMeta.name+"_name"]: select_value_name
             }
         })
-        this.setState({errorRecord})
+        //this.setState({errorRecord})
     }
     options(selector){
         let dictionart_array=[];
@@ -274,17 +309,37 @@ class Organization_base extends Component {
             }
         })
     }
+    /*
     UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.customerID !== this.props.customerID) {
             this.setState({loading: true});
             this._loadAsyncData(nextProps.customerID);
         }
     }
+    */
+    componentDidUpdate() {
+        //console.log(this.props.customerData)
+        //console.log(this.state.customerID+"="+this.props.customerData.id)
+        if(this.state.customerID!=this.props.customerData.id){
+            
+            //this.setState({newRecord:this.props.customerData})
+            //this.setState({oldRecord:this.props.customerData})
+            this.setState({customerID:this.props.customerData.id})            
+            this.setTableData(this.props.customerData)
+
+        }
+        /*
+        if (prevProps.customerID !== this.props.customerData.customerID) {
+            console.log(this.props.customerData)    
+        //this.updateAndNotify();
+        }
+        */
+    }
     componentDidMount() {
-        this._loadAsyncData(this.props.customerID);
         sessionStorage.setItem("key_action", "organization_base")
         document.addEventListener("keydown", this.keyFunction, false);
-
+        //console.log(this.props.customerData)
+        this.setTableData(this.props.customerData)
     }
     keyFunction(event){
         if(sessionStorage.getItem("key_action")=="organization_base"){
@@ -299,9 +354,11 @@ class Organization_base extends Component {
     }
     componentWillUnmount() {
         document.removeEventListener("keydown", this.keyFunction, false);
+        /*
         if (this._asyncRequest) {
             this._asyncRequest.cancel();
         }
+        */
     }
     _esc(){  
         const data_changed=(JSON.stringify(this.state.newRecord)===JSON.stringify(this.state.oldRecord));
@@ -310,14 +367,36 @@ class Organization_base extends Component {
             this.props.closeInfo()
 
         }else{//Отмена изменений
-            let data=this.state.oldRecord
-            this.setState({data:data})
+            //let data=this.state.oldRecord
+            //this.setState({data:data})
             //console.log(data)
-            this.setTableData()
+            this.setTableData(this.state.oldRecord)
             //console.log(this.state)
         }
     }
+    _enter(){
 
+        fetch('/api/customers/'+this.state.customerID, {
+                method: 'PUT',
+                body: JSON.stringify(this.state.newRecord),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then(response => response.json())
+            .then((response)=>{
+                if(response.success){
+                    
+                    Object.keys(response["dictionaries"]).map((item) => 
+                        sessionStorage.setItem(item, JSON.stringify(response["dictionaries"][item]))
+                    );
+                    this.setTableData(this.state.newRecord)
+                    this.props.updateTable()
+                }
+            })
+    }
+    /*
     _loadAsyncData(customerID) {
         fetch('/api/customers/'+customerID)
             .then(response => response.json())
@@ -326,17 +405,17 @@ class Organization_base extends Component {
                 this.setTableData()
             })    
     }
+    */
     declOfNum(number, titles)
     {
         let cases = [2, 0, 1, 1, 1, 2];
         return titles[ (number%100>4 && number%100<20)? 2 : cases[(number%10<5)?number%10:5] ];
     }
 
-    setTableData(){
-        
-
+    setTableData(data){
+        /*
         let data=this.state.data
-        
+        */
 
         let newRecordDates=[]
         let newRecordDatesName=[]
@@ -371,7 +450,7 @@ class Organization_base extends Component {
         this.setState({newRecordDatesName:newRecordDatesName})
         
         this.setState({loading:false})
-        console.log(this.state.newRecord)
+        //console.log(this.state.newRecord)
 
     }
    
@@ -387,7 +466,11 @@ class Organization_base extends Component {
             )
         }*/
         
-        let profile_info=!this.state.loading?
+        //let profile_info=!this.state.loading?
+        let profile_info=''
+        if(!this.state.loading){
+            profile_info=
+            
         <div>
             <div className="tab_block">
                 <div className="frm_row">
@@ -401,12 +484,6 @@ class Organization_base extends Component {
                                     this.options("subdivision").find(op => {
                                         return op.value === this.state.newRecord["subdivision_id"]
                                     })}
-                                    /*
-                                    value={this.state.newRecord["subdivision_id"]?
-                                    this.options("subdivision").find(op => {
-                                        return op.value === this.state.newRecord["subdivision_id"]
-                                    }):null}
-                                    */
 
                                     className="itm_selector"
                                     cacheOptions
@@ -430,12 +507,7 @@ class Organization_base extends Component {
                                 this.options("department").find(op => {
                                     return op.value === this.state.newRecord["department_id"]
                                 })}
-                                /*
-                                value={this.state.newRecord["department_id"]?
-                                this.options("department").find(op => {
-                                    return op.value === this.state.newRecord["department_id"]
-                                }):null}
-                                */
+                                
 
                                 className="itm_selector"
                                 cacheOptions
@@ -455,7 +527,7 @@ class Organization_base extends Component {
                             <div className="itm_caption">Должность</div>
                             <input type="text" className="itm_input" 
                                 autoComplete="new-password"
-                                value={this.state.newRecord.position} 
+                                value={this.state.newRecord.position?this.state.newRecord.position:""} 
                                 name="position" 
                                 onChange={this._updateInput} 
                             />
@@ -472,12 +544,7 @@ class Organization_base extends Component {
                                 this.options("custstatus").find(op => {
                                     return op.value === this.state.newRecord["custstatus_id"]
                                 })}
-                                /*
-                                value={this.state.newRecord["custstatus_id"]?
-                                this.options("custstatus").find(op => {
-                                    return op.value === this.state.newRecord["custstatus_id"]
-                                }):null}
-                                */
+                               
 
                                 className="itm_selector"
                                 cacheOptions
@@ -565,9 +632,11 @@ class Organization_base extends Component {
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Куратор сотрудника</div>
                             <AsyncSelect
-                                name={this.state.newRecord.curator}
+                                name="curator"
                                 className="itm_selector"
                                 value={{value:this.state.newRecord["curator_id"],label:this.state.newRecord["curator"]}}
+                                //value={{value:1,label:"test"}}
+
                                 styles={customStyles}
                                 formatOptionLabel={formatOptionLabel}
                                 placeholder={" - введите - "}
@@ -576,7 +645,7 @@ class Organization_base extends Component {
                                 loadOptions={promiseOptions}
                                 defaultOptions
                                 //onInputChange={this.handleInputChange}
-                                onChange={this.handleChangeSelect}
+                                onChange={this.handleChangeSelectAcync}
                             />
                         </div>
                     </div>
@@ -589,7 +658,8 @@ class Organization_base extends Component {
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Оклад</div>
                             <CurrencyInput 
-                                value={this.state.newRecord.salary} name="salary" className="itm_input"
+                                value={this.state.newRecord.salary?this.state.newRecord.salary:""} 
+                                name="salary" className="itm_input"
                                 precision={0} thousandSeparator={' '} allowEmpty={true} suffix={' Р'} 
                                 onChange={(value)=>this.handleChangeCurrency("salary",value)}
                             />
@@ -599,7 +669,8 @@ class Organization_base extends Component {
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Надбавка в %</div>
                             <CurrencyInput 
-                                value={this.state.newRecord.salary_add} name="salary_add" className="itm_input"
+                                value={this.state.newRecord.salary_add?this.state.newRecord.salary_add:""} 
+                                name="salary_add" className="itm_input"
                                 precision={0} thousandSeparator={''} allowEmpty={true} suffix={'%'} 
                                 onChange={(value)=>this.handleChangePercent("salary_add",value)}
                                 onKeyDown={(event)=>this.handleKeyPress(event,"salary_add")}
@@ -612,7 +683,8 @@ class Organization_base extends Component {
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Оклад с надбавкой</div>
                             <CurrencyInput 
-                                value={this.state.newRecord.salary_summ} name="salary_summ" className="itm_input"
+                                value={this.state.newRecord.salary_summ?this.state.newRecord.salary_summ:""}
+                                name="salary_summ" className="itm_input"
                                 precision={0} thousandSeparator={' '} allowEmpty={true} suffix={' Р'} 
                                 onChange={(value)=>this.handleChangeCurrency("salary_summ",value)}
                             />
@@ -626,7 +698,8 @@ class Organization_base extends Component {
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Премия в %</div>
                             <CurrencyInput 
-                                value={this.state.newRecord.prize_perc} name="prize_perc" className="itm_input"
+                                value={this.state.newRecord.prize_perc?this.state.newRecord.prize_perc:""}
+                                name="prize_perc" className="itm_input"
                                 precision={0} thousandSeparator={''} allowEmpty={true} suffix={'%'} 
                                 onChange={(value)=>this.handleChangePercent("prize_perc",value)}
                                 onKeyDown={(event)=>this.handleKeyPress(event,"prize_perc")}
@@ -637,7 +710,8 @@ class Organization_base extends Component {
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Премия</div>
                             <CurrencyInput 
-                                value={this.state.newRecord.prize} name="prize" className="itm_input"
+                                value={this.state.newRecord.prize?this.state.newRecord.prize:""} 
+                                name="prize" className="itm_input"
                                 precision={0} thousandSeparator={' '} allowEmpty={true} suffix={' Р'} 
                                 onChange={(value)=>this.handleChangeCurrency("prize",value)}
                             />
@@ -652,7 +726,7 @@ class Organization_base extends Component {
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Основной отпуск</div>
                             <input type="text" className="itm_input" 
-                                value={this.state.newRecord.vacation_base} 
+                                value={this.state.newRecord.vacation_base?this.state.newRecord.vacation_base:""} 
                                 name="vacation_base" 
                                 onChange={this._updateInput}
                             />
@@ -662,7 +736,7 @@ class Organization_base extends Component {
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Дополнительный отпуск</div>
                             <input type="text" className="itm_input" 
-                                value={this.state.newRecord.vacation_add} 
+                                value={this.state.newRecord.vacation_add?this.state.newRecord.vacation_add:""} 
                                 name="vacation_add" 
                                 onChange={this._updateInput}
                             />
@@ -679,8 +753,10 @@ class Organization_base extends Component {
                     <div className={"btn btn_enter "+(data_changed?'unactive':'')} onClick={this._enter}>Сохранить (Enter)</div>-
                 </div>
             </div>
-        </div>                
-        :''
+        </div>
+        
+        }
+        
         return (
             <div className="profile_info">
                 <Loader loading={this.state.loading} />

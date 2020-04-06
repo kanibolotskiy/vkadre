@@ -17,13 +17,20 @@ use App\Visit;
 use App\Polygraf;
 use App\File;
 
+use App\Property_education;
 use App\Property_typevacation;
 use App\Property_typeproperty;
 use App\Property_typecredit;
 use App\Property_typelink;
+use App\Property_status;
+use App\Property_criminal;
 
 use App\Property_martial;
 use App\Property_gender;
+
+use App\Property_subdivision;
+use App\Property_custstatus;
+use App\Property_department;
 
 use DB;
 
@@ -32,10 +39,15 @@ class CustomersController extends Controller
     static function sortUrl($output,$table=null){
         $out["selector"]=$table?$table.".id":"id";
         $out["order"]="ASC";
+        //echo $out["selector"]."|".
+        
         if(isset($output["sort"])){
             $sort_arr=json_decode($output["sort"],TRUE);
-            $out["selector"]=$sort_arr[0]["columnName"];
-            $out["order"]=$sort_arr[0]["direction"];
+            //print_r($sort_arr);
+            if(isset($sort_arr[0]["columnName"])){
+                $out["selector"]=$sort_arr[0]["columnName"];
+                $out["order"]=$sort_arr[0]["direction"];
+            }
         }
         return $out;
     }
@@ -49,11 +61,24 @@ class CustomersController extends Controller
         ->leftjoin('property_subdivisions as ps', 'ps.id', '=', 'customers.subdivision_id')
         ->leftjoin('property_custstatuses as pc', 'pc.id', '=', 'customers.custstatus_id')
         ->leftjoin('property_departments as pd', 'pd.id', '=', 'customers.department_id')
+        ->leftjoin('property_educations as pe', 'pe.id', '=', 'customers.education_id')
+        ->leftjoin('property_statuses as pst', 'pst.id', '=', 'customers.status_id')
+        ->leftjoin('property_criminals as pcr', 'pcr.id', '=', 'customers.criminal_id')
+        ->leftjoin('customers as cur', 'cur.id', '=', 'customers.curator_id')
         ->select(
             'customers.*',
-            'pm.name as martial','pg.name as gender','ps.name as subdivision','pc.name as custstatus','pd.name as department',
-
-            DB::raw('CONCAT(customers.surname," ",customers.name," ",customers.patronymic) as fullname'))
+            'pm.name as martial',
+            'pg.name as gender',
+            'ps.name as subdivision',
+            'pc.name as custstatus',
+            'pd.name as department',
+            'pe.name as education',
+            'pst.name as status',
+            'pcr.name as criminal',
+            //'cur.name as curator',
+            DB::raw('CONCAT(IF(customers.surname IS NULL,"",customers.surname)," ",IF(customers.name IS NULL,"",customers.name)," ",IF(customers.patronymic IS NULL,"",customers.patronymic)) as fullname,
+            CONCAT(IF(cur.surname IS NULL,"",cur.surname)," ",IF(cur.name IS NULL,"",cur.name)," ",IF(cur.patronymic IS NULL,"",cur.patronymic)) as curator
+            '))
         ->get();
     }
     //DATE_FORMAT(customers.dob,"%d.%m.%Y")
@@ -61,7 +86,8 @@ class CustomersController extends Controller
     public function customers_select(Request $request){
         $searchParam=$request->searchParam;
         if($searchParam){
-            return Customer::select('customers.id as value', DB::raw('CONCAT(customers.surname," ",customers.name," ",customers.patronymic) as label'))
+            return Customer::select('customers.id as value', 
+            DB::raw('CONCAT(IF(customers.surname IS NULL,"",customers.surname)," ",IF(customers.name IS NULL,"",customers.name)," ",IF(customers.patronymic IS NULL,"",customers.patronymic)) as label'))
             ->where('customers.name','like','%'.$searchParam.'%')
             ->orWhere('customers.surname','like','%'.$searchParam.'%')
             ->orWhere('customers.patronymic','like','%'.$searchParam.'%')
@@ -85,8 +111,23 @@ class CustomersController extends Controller
         return $customer;
     }
     
-    public function update(Request $request, Customer $customer)
+    public function update(Request $request, Customer $customer=null)
     {
+        $properties=[];
+
+        if(!$customer){
+            $customer=new Customer;
+        }
+
+        $file=$request->file('file');//->getClientOriginalName();
+        if($file){
+            $filename       = $file->getClientOriginalName();
+            $destinationPath = public_path('/uploads/photo/'.$customer->id."/");
+            $uploadValue     = $file->move($destinationPath, $filename);
+            $customer->photo=$destinationPath.$filename;
+            //DB::insert('insert into files (polygraf_id,file_path,file_name) values (?,?,?)',[$polygraf->id,$destinationPath,$filename]);  
+        }
+
         /**Семейный статус */
         $martial_item=$request->get('martial_name');
         if($martial_item){
@@ -94,6 +135,7 @@ class CustomersController extends Controller
             $item->name = $request->get('martial_name');
             $item->save();
             $martial_id=$item->id;
+            $properties["martial"]=Property_martial::select('id as value','name as label')->orderBy('name','ASC')->get();
         }else{
             $martial_id=$request->get('martial_id');
         }
@@ -105,21 +147,163 @@ class CustomersController extends Controller
             $item->name = $request->get('gender_name');
             $item->save();
             $gender_id=$item->id;
+            $properties["gender"]=Property_gender::select('id as value','name as label')->orderBy('name','ASC')->get();
         }else{
             $gender_id=$request->get('gender_id');
         }
+
+        /**Образование*/
+        $education_item=$request->get('education_name');
+        if($education_item){
+            $item = new Property_education;
+            $item->name = $request->get('education_name');
+            $item->save();
+            $education_id=$item->id;
+            $properties["education"]=Property_education::select('id as value','name as label')->orderBy('name','ASC')->get();
+        }else{
+            $education_id=$request->get('education_id');
+        }
+
+        /**Статус*/
+        $status_item=$request->get('status_name');
+        if($status_item){
+            $item = new Property_status;
+            $item->name = $request->get('status_name');
+            $item->save();
+            $status_id=$item->id;
+            $properties["status"]=Property_status::select('id as value','name as label')->orderBy('name','ASC')->get();
+        }else{
+            $status_id=$request->get('status_id');
+        }
+
+        /**Судимость*/
+        $criminal_item=$request->get('criminal_name');
+        if($criminal_item){
+            $item = new Property_criminal;
+            $item->name = $request->get('criminal_name');
+            $item->save();
+            $criminal_id=$item->id;
+            $properties["criminal"]=Property_criminal::select('id as value','name as label')->orderBy('name','ASC')->get();
+        }else{
+            $criminal_id=$request->get('criminal_id');
+        }
+
+        /***
+use App\Property_subdivision;
+use App\Property_custstatus;
+use App\Property_department;
+ */
+        /**Подразделение*/
+        $subdivision_item=$request->get('subdivision_name');
+        if($subdivision_item){
+            $item = new Property_subdivision;
+            $item->name = $request->get('subdivision_name');
+            $item->save();
+            $subdivision_id=$item->id;
+            $properties["subdivision"]=Property_subdivision::select('id as value','name as label')->orderBy('name','ASC')->get();
+        }else{
+            $subdivision_id=$request->get('subdivision_id');
+        }
+
+        /**Статус сотрудника*/
+        $custstatus_item=$request->get('custstatus_name');
+        if($custstatus_item){
+            $item = new Property_custstatus;
+            $item->name = $request->get('custstatus_name');
+            $item->save();
+            $custstatus_id=$item->id;
+            $properties["custstatus"]=Property_custstatus::select('id as value','name as label')->orderBy('name','ASC')->get();
+        }else{
+            $custstatus_id=$request->get('custstatus_id');
+        }
+        
+        /**Отдел*/
+        $department_item=$request->get('department_name');
+        if($department_item){
+            $item = new Property_department;
+            $item->name = $request->get('department_name');
+            $item->save();
+            $department_id=$item->id;
+            $properties["department"]=Property_department::select('id as value','name as label')->orderBy('name','ASC')->get();
+        }else{
+            $department_id=$request->get('department_id');
+        }
+
+
         /*Текстовые*/
         $customer->name=$request->get('name');
         $customer->surname=$request->get('surname');
         $customer->patronymic=$request->get('patronymic');
-            
+        $customer->phone=$request->get('phone');
+        $customer->mobphone=$request->get('mobphone');
+
+        $customer->address_reg=$request->get('address_reg');
+        $customer->address_res=$request->get('address_res');
+        $customer->index_address_reg=$request->get('index_address_reg');
+        $customer->index_address_res=$request->get('index_address_res');
+
+        $customer->passport_number=$request->get('passport_number');
+        $customer->passport_issuedby=$request->get('passport_issuedby');
+        $customer->bpl=$request->get('bpl');
+        $customer->inn=$request->get('inn');
+        $customer->insurance_number=$request->get('insurance_number');
+        $customer->medical_number=$request->get('medical_number');
+        $customer->education_cap=$request->get('education_cap');
+        $customer->education_speciality=$request->get('education_speciality');
+        $customer->military_number=$request->get('military_number');
+        $customer->military_place=$request->get('military_place');
+        $customer->criminal_desc=$request->get('criminal_desc');
+        $customer->characteristic=$request->get('characteristic');
+        $customer->position=$request->get('position');
+        $customer->vacation_base=$request->get('vacation_base');
+        $customer->vacation_add=$request->get('vacation_add');
+        
+        
+        /**Цены */
+
+        $customer->salary=($request->get('salary')? preg_replace('/[^0-9.]/', '', $request->get('salary')):0);
+        $customer->salary_add=($request->get('salary_add')? preg_replace('/[^0-9.]/', '', $request->get('salary_add')):0);
+        $customer->salary_summ=($request->get('salary_summ')? preg_replace('/[^0-9.]/', '', $request->get('salary_summ')):0);
+
+        $customer->prize_perc=($request->get('prize_perc')? preg_replace('/[^0-9.]/', '', $request->get('prize_perc')):0);
+        $customer->prize=($request->get('prize')? preg_replace('/[^0-9.]/', '', $request->get('prize')):0);
+        
+
+
+        /*Даты */
+        $customer->dob=$request->get('dob');
+        $customer->passport_date=$request->get('passport_date');
+        $customer->empl_date=$request->get('empl_date');
+        $customer->unempl_date=$request->get('unempl_date');
+
+        $customer->exp1=$request->get('exp1');
+        $customer->exp2=$request->get('exp2');
+        $customer->exp3=$request->get('exp3');
+        
 
         /*Списки*/
         $customer->martial_id=$martial_id;
         $customer->gender_id=$gender_id;
+        $customer->education_id=$education_id;
+        $customer->status_id=$status_id;
+        $customer->criminal_id=$criminal_id;
+
+        $customer->subdivision_id=$subdivision_id;
+        $customer->custstatus_id=$custstatus_id;
+        $customer->department_id=$department_id;
+
+        $customer->curator_id=$request->get('curator_id');
+        
+        //echo "!".$request->get('curator_id')."!";
         
         $customer->save();
-        return response()->json($request, 200);
+
+        $out["success"]=true;
+        
+
+        $out["dictionaries"]=$properties;
+
+        return response()->json($out, 200);
     }
  
     public function delete(Customer $customer)
@@ -286,6 +470,7 @@ class CustomersController extends Controller
     }
     public function btrip_store(Request $request,Btrip $btrip=null)
     {
+        //print_r($request->all());
         if(!$btrip){
             Btrip::create($request->all());
         }else{
@@ -468,7 +653,9 @@ class CustomersController extends Controller
 
         $polygraf = Polygraf::where('customer_id','=',$customer_id)
         ->leftjoin('customers as c', 'c.id', '=', 'polygrafs.tester_id')
-        ->select('polygrafs.*',DB::raw('CONCAT(c.surname," ",c.name," ",c.patronymic) as tester')) 
+        ->select('polygrafs.*',
+        DB::raw('CONCAT(IF(c.surname IS NULL,"",c.surname)," ",IF(c.name IS NULL,"",c.name)," ",IF(c.patronymic IS NULL,"",c.patronymic)) as tester'))
+
         ->orderBy($sorting_rule["selector"], $sorting_rule["order"])
         ->get();
         $returned=[];
@@ -491,16 +678,30 @@ class CustomersController extends Controller
     }
     public function polygraf_store(Request $request, Polygraf $polygraf=null)
     {
+        //print_r($request);
+        //print_r($_POST);
+        //echo "!".$request->date."!";
+
         if(!$polygraf){
             $polygraf = new Polygraf;
             $polygraf->customer_id=$request->get('customer_id');
         }
         
+        //$file=$polygraf->file;
+        
+
         $polygraf->date=$request->get('date');
         $polygraf->base=$request->get('base');
-
+        
         $polygraf->tester_id=$request->get('tester_id');
         $polygraf->save();
+        $file=$request->file('file');//->getClientOriginalName();
+        if($file){
+            $filename       = $file->getClientOriginalName();
+            $destinationPath = public_path('/uploads/files/'.time()."/");
+            $uploadValue     = $file->move($destinationPath, $filename);
+            DB::insert('insert into files (polygraf_id,file_path,file_name) values (?,?,?)',[$polygraf->id,$destinationPath,$filename]);  
+        }
 
         $out["success"]=true;        
         return response()->json($out,201);

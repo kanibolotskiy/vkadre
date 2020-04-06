@@ -20,13 +20,39 @@ export default (m_props) => {
   const URL_orders = m_props.url+"_order"
   const URL_hides = m_props.url+"_hide"
 
+  
+  /*
+  someFunction = (text) => {
+    console.log('Message from parent: ', text);
+  }
+  
+  const [dataRows, setDataRows] = useState(m_props);
+  const setDataRows = (props) =>{
+    /*
+if(m_props.updateTableFlag){
+    console.log("update_data_flag="+m_props.updateTableFlag)
+    //console.log(m_props)
+    m_props.updateTableFlagFunction()
+  }
+    
+  }
+  */
+ useEffect(() => {
+  if(m_props.updateTableFlag){
+    setLastQuery("");
+    m_props.updateTableFlagFunction()
+  }
+}, [m_props]);
+
+  
  const rowClick = props => {
   const { value } = props;
   return (
     <Table.Row {...props} onClick={() =>
       //console.log("props.row.id="+props.row.id)
       //m_props.clickRowData(props.row.id)
-      m_props.clickData(props.row.id)
+      //m_props.clickData(props.row.id)
+      m_props.clickData(props.row)
     } />
   );
 };
@@ -122,7 +148,6 @@ export default (m_props) => {
     { columnName: 'dob', align: 'left',width:100},
   ]);
   */
-  
 
   /*Ширина колонок*/
   const savedCoumnsWidth = () => {

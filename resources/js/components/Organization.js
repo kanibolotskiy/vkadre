@@ -101,7 +101,8 @@ class Organization extends Component {
         this.setAction = this.setAction.bind(this)
         this.addNew = this.addNew.bind(this)
         this.closeInfo = this.closeInfo.bind(this)
-        
+        this.updateTable = this.updateTable.bind(this)
+
     }
     setInfo(stateActive){
         this.props.updateData(stateActive,'stateActiveOrganization')
@@ -118,6 +119,10 @@ class Organization extends Component {
     closeInfo(){
         this.props.closeInfo()
     }
+    updateTable(){
+        //console.log("upd1")
+        this.props.updateTable()
+    }
     render() { 
         const tab_blocks_header = []    //Вкладки профиля
         const tab_btns = []             //Кнопки добавления
@@ -133,7 +138,7 @@ class Organization extends Component {
             block_tables.push(
                 this.props.selected==item.selected? 
                     <Profile_table key={index}
-                        customerID={this.props.customerID} 
+                        customerID={this.props.customerData.id} 
                         stateAction={this.state.stateAction} 
                         setAction={this.setAction}
                         url={item.url}
@@ -157,7 +162,13 @@ class Organization extends Component {
                         <div className="btn">Печать</div>
                     </div>
                 </div>
-                {this.props.selected==1? <Organization_base closeInfo={this.closeInfo} customerID={this.props.customerID} />:''}
+                {this.props.selected==1? 
+                    <Organization_base 
+                        closeInfo={this.closeInfo} 
+                        updateTable={this.updateTable}
+                        //customerID={this.props.customerID} 
+                        customerData={this.props.customerData}
+                    />:''}
                 {block_tables}
                 
             </div>

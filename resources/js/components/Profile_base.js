@@ -72,10 +72,15 @@ class Profile_base extends Component {
         //Initialize the state in the constructor
         this.state = {
             loading:true,
-            data:[],
+            /*
+            data:{
+                name:"",
+                surname:"",
+            },
+            */
             newRecordDatesName:[],
             newRecordDates:[],
-            customerID:0,
+            customerID:-1,
             //address_reg_line:[],
             address_lines:[],
             suggestions: [],
@@ -103,7 +108,12 @@ class Profile_base extends Component {
         this.keyFunction = this.keyFunction.bind(this)
         this._enter = this._enter.bind(this);
         this._esc = this._esc.bind(this);
+        this.handleChangeFile = this.handleChangeFile.bind(this);
         
+        
+        //this._loadTableData = this._loadTableData.bind(this);
+        
+
     }
 
     zoomPhoto(flag){
@@ -124,12 +134,44 @@ class Profile_base extends Component {
         }
         return dictionart_array
     }
-    
+    componentDidUpdate() {
+        //console.log(this.props.customerData)
+        //console.log(this.state.customerID+"="+this.props.customerData.id)
+        if(this.state.customerID!=this.props.customerData.id){
+            
+            //this.setState({newRecord:this.props.customerData})
+            //this.setState({oldRecord:this.props.customerData})
+            this.setState({customerID:this.props.customerData.id})            
+            this.setTableData(this.props.customerData)
+
+        }
+        /*
+        if (prevProps.customerID !== this.props.customerData.customerID) {
+            console.log(this.props.customerData)    
+          //this.updateAndNotify();
+        }
+        */
+    }
     componentDidMount() {
-        this._loadAsyncData(this.props.customerID);
+        //console.log(this.props.customerData)
+        //this.setState({newRecord:this.props.customerData})
+        //this.setState({oldRecord:this.props.customerData})
+        //this.setState({data:this.props.customerData})
+        //this.setState({customerID:this.props.customerData.id})
         sessionStorage.setItem("key_action", "profile_base")
         document.addEventListener("keydown", this.keyFunction, false);
+        this.setTableData(this.props.customerData)
+        
+        //this.setState({loading:false})
 
+        //this.setState({data:this.props.customerData})
+        //this.setState({customerID:this.props.customerData.customerID})
+        //this.setState({loading:false})
+        /*
+        this._loadAsyncData(this.props.customerID);
+        sessionStorage.setItem("key_action", "profile_base")
+        
+        */
     }
     keyFunction(event){
         if(sessionStorage.getItem("key_action")=="profile_base"){
@@ -137,8 +179,7 @@ class Profile_base extends Component {
                 this._esc()
             }
             if(event.keyCode === 13) {
-                console.log(event)
-                //this.addRecord()
+                this._enter()
             }
         }
     }
@@ -147,24 +188,85 @@ class Profile_base extends Component {
            this.setState({zoom:false}) 
         }else{   
             const data_changed=(JSON.stringify(this.state.newRecord)===JSON.stringify(this.state.oldRecord));
+            //console.log(data_changed)
             if(data_changed){//Выход наружу
-                //this.props.setAction(1)  
+                //this.props.setAction(1) 
+                document.removeEventListener("keydown", this.keyFunction, false); 
                 this.props.closeInfo()
 
             }else{//Отмена изменений
-                let data=this.state.oldRecord
-                this.setState({data:data})
+                //let data=this.state.oldRecord
+                //this.setState({data:data})
                 //console.log(data)
-                this.setTableData()
+                this.setTableData(this.state.oldRecord)
+                if(this.fileInput!=undefined){
+                    this.fileInput.value = "";
+                    this.setState({filename:""})
+                }
                 //console.log(this.state)
             }
         }
     }
     _enter(){
+        let url_update='';
+        let method='';
+        
+        if(this.props.action==2){   //Добавить новый
+            //url_update='api/'+this.props.url;
+            var fetch_url='/api/customers/'
+            
+            method="post";
+            var data = new FormData()
+        }else{                      //Обновить
+            //url_update='api/'+this.props.url+"/"+this.props.rowData.id
+            var fetch_url='/api/customers/'+this.state.customerID
+
+            method="POST";
+            
+            var data = new FormData()
+            data.append('_method', 'PUT')
+        }
+        
+        Object.keys(this.state.newRecord).map((item) => {
+            if(this.state.newRecord[item]){
+                data.append(item, this.state.newRecord[item])
+            }
+        }
+            //console.log(item+"="+this.state.newRecord[item])
+            //data.append('file', input.files[0])
+            //data.append(item, this.state.newRecord[item])
+        );
+        
+        var input = document.querySelector('input[type="file"]')
+        if(input){
+            data.append('file', input.files[0])
+        }
+
+        fetch(fetch_url, {
+            method:method,
+            body: data
+        })
+        .then(response => response.json())
+            .then((response)=>{
+                if(response.success){
+                    
+                    Object.keys(response["dictionaries"]).map((item) => 
+                        sessionStorage.setItem(item, JSON.stringify(response["dictionaries"][item]))
+                    );
+                    this.setTableData(this.state.newRecord)
+                    this.props.updateTable()
+                }
+            })
         
         /*
-        fetch('/api/customers/'+this.props.customerID, {
-                method: 'PUT',
+        var method="PUT"
+        var fetch_url='/api/customers/'+this.state.customerID
+        if(!this.state.newRecord.id){
+            method="POST"
+            fetch_url='/api/customers/'
+        }
+        fetch(fetch_url, {
+                method: method,
                 body: JSON.stringify(this.state.newRecord),
                 headers: {
                     'Accept': 'application/json',
@@ -172,43 +274,61 @@ class Profile_base extends Component {
                 },
             })
             .then(response => response.json())
-            .then((data)=>{
-                //console.log(data)
+            .then((response)=>{
+                if(response.success){
+                    
+                    Object.keys(response["dictionaries"]).map((item) => 
+                        sessionStorage.setItem(item, JSON.stringify(response["dictionaries"][item]))
+                    );
+                    this.setTableData(this.state.newRecord)
+                    this.props.updateTable()
+                }
             })
-        
         */
-
     }
 
+    /*
     UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.customerID !== this.props.customerID) {
             this.setState({loading: true});
             this._loadAsyncData(nextProps.customerID);
         }
     }
+    */
+
     componentWillUnmount() {
         document.removeEventListener("keydown", this.keyFunction, false);
+        /*
         if (this._asyncRequest) {
             this._asyncRequest.cancel();
         }
+        */
     }
+    /*
     _loadAsyncData(customerID) {
+        //console.log(this.props)
+        //console.log(customerID)
+        
         fetch('/api/customers/'+customerID)
             .then(response => response.json())
             .then((response)=>{
                 this.setState({data:response})
                 this.setTableData()
             })    
+        
     }
+    */
+    
     /*-----------------------------------------------------------------------------*/
     declOfNum(number, titles)
     {
         let cases = [2, 0, 1, 1, 1, 2];
         return titles[ (number%100>4 && number%100<20)? 2 : cases[(number%10<5)?number%10:5] ];
     }
-    setTableData(){
+
+    setTableData(data){
         
-        let data=this.state.data
+        //let data=this.state.data
         //console.log(data)
 
         let newRecordDates=[]
@@ -230,6 +350,7 @@ class Profile_base extends Component {
                 newRecordDatesName[column_name]="("+f_years+" "+this.declOfNum(f_years,["год","года","лет"])+")";
             }
         }
+
         this.setState({oldRecord:data})
         this.setState({newRecord:data})
 
@@ -365,7 +486,24 @@ class Profile_base extends Component {
 
  */
 
+    handleChangeFile(event){
+        var input = document.querySelector('input[type="file"]')
+        var tmppath = URL.createObjectURL(event.target.files[0]);
+        //newRecord.photo
 
+        //console.log()
+        this.setState({
+            newRecord:{
+                ...this.state.newRecord,
+                photo:tmppath,
+            }
+        })
+
+        console.log(input.files[0].name)
+    
+    }
+
+    
     render() { 
         const data_changed=(JSON.stringify(this.state.newRecord)===JSON.stringify(this.state.oldRecord));            
         let data_address_lines=[]
@@ -376,18 +514,34 @@ class Profile_base extends Component {
                 <div key={key} className="address_hint_line" onClick={()=>this.choiseAddress(key)}>{item.value}</div>
             )
         }
-
         
-        let profile_info=!this.state.loading?
-        <div>
-            
-                
+        //console.log("ok")
+        /*
+        if(this.state.customerID!=this.props.customerID){
+            //this.setState({customerID:this.props.customerID})
+            this._loadTableData(this.props.customerData)
+            //console.log(this.props)
+            //this._loadAsyncData(this.props.customerID)
+            //this.setState({customerID:this.props.customerID})
+        }
+        */
+
+        //let profile_info=!this.state.loading?
+
+        let profile_info=''
+        if(!this.state.loading){
+            profile_info=
+            <div>    
             <div className="tab_block">
                 <div className="frm_row">
                     <div className="col2">
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Фамилия</div>
-                            <input autoComplete="new-password" value={this.state.newRecord.surname} name="surname" onChange={this._updateInput} type="text" className="itm_input"/>
+                            <input 
+                                autoComplete="new-password" 
+                                value={this.state.newRecord.surname?this.state.newRecord.surname:""} 
+                                name="surname" 
+                                onChange={this._updateInput} type="text" className="itm_input"/>
                         </div>
                         
                     </div>
@@ -402,9 +556,12 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                             <div onClick={()=>this.zoomPhoto(false)} className="profilePhoto_close">X</div>
                         :''}
                         <div className="profilePhoto_captions">
-                            <div className="profilePhoto_add">
-{this.state.newRecord.photo?'Изменить фото':'Добавить фото'}
-                            </div>
+<div className="profilePhoto_add">
+    <input accept="image/*" className="inputfile" type="file" name="file" id="file" onChange={this.handleChangeFile} ref={ref => this.fileInput = ref}/>
+    <label for="file">{this.state.newRecord.photo?'Изменить фото':'Добавить фото'}</label>
+
+</div>
+
                             {this.state.newRecord.photo?
                             <div onClick={this._delPhoto} className="profilePhoto_edit">Удалить</div>
                             :''}
@@ -416,7 +573,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Имя</div>
                             <input 
-                                value={this.state.newRecord.name} 
+                                value={this.state.newRecord.name?this.state.newRecord.name:""} 
                                 name="name" 
                                 onChange={this._updateInput} 
                                 type="text" className="itm_input"/>
@@ -425,7 +582,9 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                     <div className="col">
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Отчество</div>
-                            <input value={this.state.newRecord.patronymic} name="patronymic" onChange={this._updateInput} type="text" className="itm_input"/>
+                            <input 
+                                value={this.state.newRecord.patronymic?this.state.newRecord.patronymic:""} 
+                                name="patronymic" onChange={this._updateInput} type="text" className="itm_input"/>
                         </div>
                     </div>
                     <div className="col"></div>
@@ -434,7 +593,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                     <div className="col">
                         <div className="wrp_itm_input">
                             <div className="itm_caption">ID</div>
-                            <input type="text" className="itm_input itm_input_disabled" readOnly value={this.props.customerID}/>
+                            <input type="text" className="itm_input itm_input_disabled" readOnly value={this.state.newRecord.id}/>
                         </div>
                     </div>
                     <div className="col"></div><div className="col"></div>
@@ -449,7 +608,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                                 inputClass="itm_input"
                                 country={'ru'}
                                 
-                                value={this.state.newRecord.mobphone}
+                                value={this.state.newRecord.mobphone?this.state.newRecord.mobphone:""}
                                 onChange={(phone)=>this._updateInputName("mobphone",phone)}
                             />
                         </div>
@@ -461,7 +620,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                                 inputClass="itm_input"
                                 country={'ru'}
                                 
-                                value={this.state.newRecord.phone}
+                                value={this.state.newRecord.phone?this.state.newRecord.phone:""}
                                 onChange={(phone)=>this._updateInputName("phone",phone)}
                             />
                         </div>
@@ -490,17 +649,18 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                             <div className="itm_caption">Семейное положение</div>
                             <CreatableSelect 
                                 name="martial"
+
+                                value={
+this.options("martial").find(op => {
+    return op.value === this.state.newRecord["martial_id"]
+})}
+                                /*
                                 value={
                                 this.options("martial").find(op => {
                                     return op.value === this.state.newRecord["martial_id"]
                                 })}
-
-                                /*
-                                value={this.state.newRecord["martial_id"]?
-                                this.options("martial").find(op => {
-                                    return op.value === this.state.newRecord["martial_id"]
-                                }):null}
                                 */
+
 
                                 className="itm_selector"
                                 cacheOptions
@@ -525,13 +685,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                                 this.options("gender").find(op => {
                                     return op.value === this.state.newRecord["gender_id"]
                                 })}
-                                /*
-                                value={this.state.newRecord["gender_id"]?
-                                this.options("gender").find(op => {
-                                    return op.value === this.state.newRecord["gender_id"]
-                                }):null}
-                                */
-
+                                
                                 className="itm_selector"
                                 cacheOptions
                                 defaultOptions
@@ -551,29 +705,19 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Адрес регистрации</div>
                             <Suggestion_item 
-                                value={this.state.newRecord.address_reg} 
+                                value={this.state.newRecord.address_reg?this.state.newRecord.address_reg:""} 
                                 onSelect={this._updateAddress} 
                                 onChange={this._updateInputName} 
                                 name="address_reg" 
                             />
                         </div>
-
-                        {data_address_lines["address_reg_line"]?
-                            <div className="wrp_address_hint">
-                                <div className="address_hint_caption">Выберите вариант или продолжите ввод</div>
-                                <div className="address_hint_lines">
-                                    {data_address_lines["address_reg_line"]}
-                                </div>
-                            </div>
-                        :''}
-                        
                     </div>
                     <div className="col">
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Индекс адреса регистрации</div>
                             <input type="text" className="itm_input" 
                                 autoComplete="new-password"
-                                value={this.state.newRecord.index_address_reg} 
+                                value={this.state.newRecord.index_address_reg?this.state.newRecord.index_address_reg:""} 
                                 name="index_address_reg" 
                                 onChange={this._updateInput} 
                             />
@@ -585,27 +729,20 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Адрес проживания</div>
                             <Suggestion_item 
-                                value={this.state.newRecord.address_res} 
+                                value={this.state.newRecord.address_res?this.state.newRecord.address_res:""} 
                                 onSelect={this._updateAddress} 
                                 onChange={this._updateInputName} 
                                 name="address_res" 
                             />
                         </div>
-                        {data_address_lines["address_res_line"]?
-                            <div className="wrp_address_hint">
-                                <div className="address_hint_caption">Выберите вариант или продолжите ввод</div>
-                                <div className="address_hint_lines">
-                                    {data_address_lines["address_res_line"]}
-                                </div>
-                            </div>
-                        :''}
+                        
                     </div>
                     <div className="col">
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Индекс адреса проживания</div>
                             <input type="text" className="itm_input" 
                                 autoComplete="new-password"
-                                value={this.state.newRecord.index_address_res} 
+                                value={this.state.newRecord.index_address_res?this.state.newRecord.index_address_res:""} 
                                 name="index_address_res" 
                                 onChange={this._updateInput} 
                             />
@@ -618,7 +755,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Серия и номер паспорта</div>
                             <input type="text" className="itm_input" 
-                                value={this.state.newRecord.passport_number} 
+                                value={this.state.newRecord.passport_number?this.state.newRecord.passport_number:""} 
                                 name="passport_number" 
                                 onChange={this._updateInput} 
                                 //defaultValue={this.state.data.passport_number}
@@ -629,7 +766,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Кем выдан</div>
                             <input type="text" className="itm_input" 
-                                value={this.state.newRecord.passport_issuedby} 
+                                value={this.state.newRecord.passport_issuedby?this.state.newRecord.passport_issuedby:""} 
                                 name="passport_issuedby" 
                                 onChange={this._updateInput} 
                                 //defaultValue={this.state.data.passport_issuedby}
@@ -655,7 +792,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Место рождения</div>
                             <input type="text" className="itm_input" 
-                                value={this.state.newRecord.bpl} 
+                                value={this.state.newRecord.bpl?this.state.newRecord.bpl:""} 
                                 name="bpl" 
                                 onChange={this._updateInput} 
                                 //defaultValue={this.state.data.bpl}
@@ -671,7 +808,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                         <div className="wrp_itm_input">
                             <div className="itm_caption">ИНН налогоплательщика</div>
                             <input type="text" className="itm_input" 
-                                value={this.state.newRecord.inn} 
+                                value={this.state.newRecord.inn?this.state.newRecord.inn:""} 
                                 name="inn" 
                                 onChange={this._updateInput}
                                 //defaultValue={this.state.data.inn}
@@ -682,7 +819,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                         <div className="wrp_itm_input">
                             <div className="itm_caption">№ страхового свидетельства</div>
                             <input type="text" className="itm_input" 
-                                value={this.state.newRecord.insurance_number} 
+                                value={this.state.newRecord.insurance_number?this.state.newRecord.insurance_number:""} 
                                 name="insurance_number" 
                                 onChange={this._updateInput}
                                 //defaultValue={this.state.data.insurance_number}
@@ -693,7 +830,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                         <div className="wrp_itm_input">
                             <div className="itm_caption">№ медицинского полюса</div>
                             <input type="text" className="itm_input" 
-                                value={this.state.newRecord.medical_number} 
+                                value={this.state.newRecord.medical_number?this.state.newRecord.medical_number:""} 
                                 name="medical_number" 
                                 onChange={this._updateInput}
                                 //defaultValue={this.state.data.medical_number}
@@ -729,7 +866,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Название учебного учреждения</div>
                             <input type="text" className="itm_input" 
-                                value={this.state.newRecord.education_cap} 
+                                value={this.state.newRecord.education_cap?this.state.newRecord.education_cap:""} 
                                 name="education_cap" 
                                 onChange={this._updateInput}
                                 //defaultValue={this.state.data.education_name}
@@ -740,7 +877,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Специальность</div>
                             <input type="text" className="itm_input" 
-                                value={this.state.newRecord.education_speciality} 
+                                value={this.state.newRecord.education_speciality?this.state.newRecord.education_speciality:""} 
                                 name="education_speciality" 
                                 onChange={this._updateInput}
                                 //defaultValue={this.state.data.education_speciality}
@@ -760,13 +897,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                                     return op.value === this.state.newRecord["status_id"]
                                 })}
 
-                                /*
-                                value={this.state.newRecord["status_id"]?
-                                this.options("status").find(op => {
-                                    return op.value === this.state.newRecord["status_id"]
-                                }):null}
-                                */
-
+                                
                                 className="itm_selector"
                                 cacheOptions
                                 defaultOptions
@@ -784,7 +915,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Номер военного билета</div>
                             <input type="text" className="itm_input" 
-                                value={this.state.newRecord.military_number} 
+                                value={this.state.newRecord.military_number?this.state.newRecord.military_number:""} 
                                 name="military_number" 
                                 onChange={this._updateInput}
                                 //defaultValue={this.state.data.military_number}
@@ -795,7 +926,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Место прохождение службы</div>
                             <input type="text" className="itm_input" 
-                                value={this.state.newRecord.military_place} 
+                                value={this.state.newRecord.military_place?this.state.newRecord.military_place:""} 
                                 name="military_place" 
                                 onChange={this._updateInput}
                                 //defaultValue={this.state.data.military_place}
@@ -814,12 +945,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                                 this.options("criminal").find(op => {
                                     return op.value === this.state.newRecord["criminal_id"]
                                 })}
-                                /*
-                                value={this.state.newRecord["criminal_id"]?
-                                this.options("criminal").find(op => {
-                                    return op.value === this.state.newRecord["criminal_id"]
-                                }):null}
-                                */
+                                
 
                                 className="itm_selector"
                                 cacheOptions
@@ -838,7 +964,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Статья и срок</div>
                             <input type="text" className="itm_input" 
-                                value={this.state.newRecord.criminal_desc} 
+                                value={this.state.newRecord.criminal_desc?this.state.newRecord.criminal_desc:""} 
                                 name="criminal_desc" 
                                 onChange={this._updateInput}
                                 //defaultValue={this.state.data.criminal_desc}
@@ -851,7 +977,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                         <div className="wrp_itm_input">
                             <div className="itm_caption">Характеристика</div>
                             <textarea className="itm_textarea" 
-                                value={this.state.newRecord.characteristic} 
+                                value={this.state.newRecord.characteristic?this.state.newRecord.characteristic:""} 
                                 name="characteristic" 
                                 onChange={this._updateInput}
                                 //defaultValue={this.state.data.characteristic}
@@ -870,7 +996,11 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                 </div>
             </div>
         </div>
-        :''
+        }
+        /*
+        let profile_info_=
+        
+        */
 
         return (
             <div className="profile_info">

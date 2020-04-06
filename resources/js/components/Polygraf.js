@@ -32,6 +32,9 @@ class Polygraf extends Component {
             }
         }
         this.setAction = this.setAction.bind(this)
+        this.keyFunction = this.keyFunction.bind(this)
+        this._esc = this._esc.bind(this)
+        
     }
     setInfo(stateActive){
         this.props.updateData(stateActive,'stateActiveProfile')
@@ -40,6 +43,27 @@ class Polygraf extends Component {
     setAction(stateAction=1){
         this.setState({stateAction:stateAction})
     }
+    keyFunction(event){
+        if(sessionStorage.getItem("key_action")=="polygraf"){
+            if(event.keyCode === 27) {  
+                this._esc()
+            }
+            if(event.keyCode === 13) {
+                
+            }
+        }
+    }
+    _esc(){
+        this.props.closeInfo()
+    }
+    componentDidMount() {
+        sessionStorage.setItem("key_action", "polygraf")
+        document.addEventListener("keydown", this.keyFunction, false);
+    }
+    componentWillUnmount() {
+        document.removeEventListener("keydown", this.keyFunction, false);
+    }
+
     render() { 
         return (
             <div>
@@ -50,7 +74,8 @@ class Polygraf extends Component {
                     </div>
                 </div>
                 <Profile_table
-                    customerID={this.props.customerID} 
+                    customerID={this.props.customerData.id}
+                    //customerData={this.props.customerData}
                     stateAction={this.state.stateAction} 
                     setAction={this.setAction}
                     url={this.state.item.url}

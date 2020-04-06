@@ -84,12 +84,16 @@ class Profile_table_edit extends Component {
             },
             
             loging:false,
-            errorRecord:{}
+            errorRecord:{},
+            filename:""
         }
         this.handleChange = this.handleChange.bind(this)
         this.handleChangeDate = this.handleChangeDate.bind(this)
         this.handleChangeSelect = this.handleChangeSelect.bind(this)
+        this.handleChangeSelectAcync = this.handleChangeSelectAcync.bind(this)
         this.handleChangeCurrency = this.handleChangeCurrency.bind(this)
+        this.handleChangeFile = this.handleChangeFile.bind(this)
+        
 
         this.addRecord = this.addRecord.bind(this)
         this._esc = this._esc.bind(this)
@@ -124,6 +128,11 @@ class Profile_table_edit extends Component {
             let oldRecord=this.state.oldRecord
             this.setState({newRecord:oldRecord})
             this.setTableData()
+            if(this.fileInput!=undefined){
+                this.fileInput.value = "";
+                this.setState({filename:""})
+            }
+
         }
     }
 
@@ -189,12 +198,13 @@ class Profile_table_edit extends Component {
         this.setState({newRecord:newRecord})
         this.setState({oldRecord:newRecord})
         this.setState(errorRecord)
+        this.setState({"loading":true})
     }
     componentDidMount(){
         sessionStorage.setItem("key_action", "profile_table_edit")
         document.addEventListener("keydown", this.keyFunction, false);
         this.setTableData()
-        this.setState({"loading":true})
+        
     }
     
     addRecord_validate(){
@@ -235,31 +245,96 @@ class Profile_table_edit extends Component {
                 }   
             }
         }
-        //console.log(flag)
-        //console.log(errorRecord)
         this.setState({errorRecord})
         return flag;
     }
+    
+    handleChangeFile(event){
+        
+        var input = document.querySelector('input[type="file"]')
+        if(input){
+            this.setState({
+                newRecord:{
+                    ...this.state.newRecord,
+                    "file": input.files[0]
+                }
+            })
+        }
+        //console.log(input.files[0].name)
+        this.setState({filename:input.files[0].name})
+        
+        console.log(this.state.newRecord)
+        /*
+        var data = new FormData()
+        Object.keys(this.state.newRecord).map((item) => 
+            //console.log(item+"="+this.state.newRecord[item])
+            //data.append('file', input.files[0])
+            data.append(item, this.state.newRecord[item])
+        );
+        
+        var input = document.querySelector('input[type="file"]')
+        data.append('file', input.files[0])
+        //data.append('test',"test")
+
+        fetch('api/test_upload', {
+            method: 'POST',
+            body: data
+        })
+        */
+    }
     addRecord(){
-        //console.log(this.state.newRecord)
+        console.log(this.props)
         if(this.addRecord_validate()){
             let url_update='';
             let method='';
             if(this.props.action==2){   //Добавить новый
                 url_update='api/'+this.props.url;
                 method="post";
+                var data = new FormData()
             }else{                      //Обновить
                 url_update='api/'+this.props.url+"/"+this.props.rowData.id
-                method="put";
+                method="POST";
+                
+                var data = new FormData()
+                data.append('_method', 'PUT')
             }
             
+            /**--------------------------
+            let uploadImage =  event.target.file;
+            let form = new FormData()
+            form.append('uploadImage',uploadImage)
+
             fetch(url_update, {
                 method:method,
                 headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(this.state.newRecord)
+                body: form,
+            })
+            .then(response => {
+                return response.json();
+            })
+            /**--------------------------*/
+
+            
+            
+            Object.keys(this.state.newRecord).map((item) => 
+                //console.log(item+"="+this.state.newRecord[item])
+                //data.append('file', input.files[0])
+                data.append(item, this.state.newRecord[item])
+            );
+            
+            var input = document.querySelector('input[type="file"]')
+            if(input){
+                //if(input.files[0]){
+                    data.append('file', input.files[0])
+                //}
+            }
+
+            fetch(url_update, {
+                method:method,
+                body: data
             })
             .then(response => {
                 return response.json();
@@ -277,6 +352,46 @@ class Profile_table_edit extends Component {
                     this.props.setAction(1)
                 }
             })
+            /*
+            fetch(url_update, {
+                method:method,
+                headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+                },
+                body: data,
+            })*/
+            
+
+            /*
+            fetch(url_update, {
+                method:method,
+                headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+                },
+                //body: JSON.stringify(this.state.newRecord)
+                body: JSON.stringify(this.state.newRecord)
+            })
+            
+            .then(response => {
+                return response.json();
+            })
+            .then( data => {
+                if(data.success){
+                    let new_item=data["new_item"]
+                    if(new_item){
+                        let dictionary_name=data["new_item_dictionary"];
+                        let dictionary_array=JSON.parse(sessionStorage.getItem(dictionary_name))
+                        dictionary_array.push({value:new_item.id,label:new_item.name})
+                        dictionary_array.sort((a, b) => a.label.toLowerCase() > b.label.toLowerCase() ? 1 : -1);
+                        sessionStorage.setItem(dictionary_name, JSON.stringify(dictionary_array))
+                    }
+                    this.props.setAction(1)
+                }
+            })
+            */
+            
         }
     }
     handleChangeDate(name,value){
@@ -350,6 +465,36 @@ class Profile_table_edit extends Component {
         })
 
     }
+    handleChangeSelectAcync(newValue, actionMeta){
+        let new_value=null
+        let select_value_id=null
+        let select_value_name=null
+
+        //console.log(newValue)
+        //console.log(actionMeta)
+        
+        switch (actionMeta.action){
+            case "select-option":
+                select_value_id=newValue.value
+                select_value_name=newValue.label
+            break;
+            /*case "create-option":
+                select_value_name=newValue.value
+            break;
+            */
+            case "clear":
+            break;
+            default:
+        }
+        //console.log(actionMeta.name+"="+select_value_id+"="+select_value_name)
+        this.setState({
+            newRecord:{
+                ...this.state.newRecord,
+                [actionMeta.name+"_id"]: select_value_id,
+                [actionMeta.name]: select_value_name
+            }
+        })
+    }
     handleChangeSelect(newValue, actionMeta){
         let new_value=null
         //let newRecord=this.state.newRecord
@@ -361,30 +506,14 @@ class Profile_table_edit extends Component {
         switch (actionMeta.action){
             case "select-option":
                 select_value_id=newValue.value
-    
-                /*
-                newRecord[actionMeta.name+"_id"]=newValue.value
-                newRecord[actionMeta.name+"_name"]=null
-                */
                 errorRecord[actionMeta.name]=false
             break;
             case "create-option":
-                //let select_value_id=null
                 select_value_name=newValue.value
-                /*
-                newRecord[actionMeta.name+"_id"]=null
-                newRecord[actionMeta.name+"_name"]=newValue.value
-                */
                 errorRecord[actionMeta.name]=false
             break;
             case "clear":
-                /*
-                newRecord[actionMeta.name+"_id"]=null
-                newRecord[actionMeta.name+"_name"]=null
-                */
-                //let select_value_id=null
-                //let select_value_name=null
-
+    
             break;
             default:
         }
@@ -502,7 +631,7 @@ class Profile_table_edit extends Component {
                     <AsyncSelect
                         name={item.name}
                         className={"itm_selector "+(this.state.errorRecord[item.name]?"_error":"")}
-                        value={{value:this.state.newRecord[item.name+"_id"],label:this.state.newRecord[item.name+"_name"]}}
+                        value={{value:this.state.newRecord[item.name+"_id"],label:this.state.newRecord[item.name]}}
                         styles={customStyles}
                         formatOptionLabel={formatOptionLabel}
                         placeholder={" - введите - "}
@@ -511,44 +640,74 @@ class Profile_table_edit extends Component {
                         loadOptions={promiseOptions}
                         defaultOptions
                         //onInputChange={this.handleInputChange}
-                        onChange={this.handleChangeSelect}
+                        //onChange={this.handleChangeSelect}
+                        onChange={this.handleChangeSelectAcync}
                     />
                     
                     
                 </div>
             case 'files':
-                /*
-                const files=this.props.columns.map((item, key) =>
-                    <div className="frm_row" key={key}>
-                        {this.renderSwitch(item)}
-                    </div>)
-                :''
-                */
-                //console.log(this.props.rowData[item.name+"_list"])
-                
+                var filelist=[]
+                //if(this.props.rowData["files_list"]!=undefined){
+                //if(typeof this.props.rowData["files_list"] !== "undefined"){
+                    /*
+                if(this.props.rowData.hasOwnProperty("files_list")){
 
-/*
-
-                        
-{this.props.rowData[item.name+"_list"].map((item,key)=>
-                            <div className="file_row" key={key}>
-                                <div className="file_row_caption"><a href={item.file_path}>{item.file_name}</a></div>
+                Object.keys(this.props.rowData.files_list).map((item) => 
+                    filelist.push(
+                    <div className="file_row">
+                        <div className="file_row_caption">
+                            <a href="{item.file_path}" >{item.file_name}</a>
+                        </div>
+                        <div className="file_row_del">Удалить</div>
+                    </div>
+                    )
+                );
+                    }
+                    */
+                var filelist=[]
+                if(this.props.rowData){
+                    if(this.props.rowData["files_list"]){
+                        Object.keys(this.props.rowData.files_list).map((item) => 
+                            //console.log(this.props.rowData.files_list[item])
+                            //console.log(key)
+                            
+                            filelist.push(
+                            <div className="file_row" key={item}>
+                                <div className="file_row_caption">
+                                    <a href={this.props.rowData.files_list[item].file_path} >{this.props.rowData.files_list[item].file_name}</a>
+                                </div>
                                 <div className="file_row_del">Удалить</div>
                             </div>
-                        )}
-*/
-//console.log(this.props.rowData);
+                            )
+                            
+                        )
+                    }
+
+                }
+                //console.log(this.props.rowData)
+                //if(!("files_list" in this.props.rowData)){
+                    //console.log(this.props.rowData["files_list"])
+                //}
+                /*
+                Object.keys(this.props.rowData.files_list).map((item) => 
+                    console.log(item)
+                )
+                */
                 return <div className="wrp_itm_input">
                     <div className="itm_caption">{item.title}</div>
                     <div className="wrp_files_list">
                         <div className="files_list">                      
-                            
+                            {filelist}
                         </div>
-                        <input type="file" name="file" onChange={this.handleChangeFile}/>
+                        <div className="wrp_inputfile">
+                            <input className="inputfile" type="file" name="file" id="file" onChange={this.handleChangeFile} ref={ref => this.fileInput = ref}/>
+                            <label for="file">Прикрепить файл...</label>
+                            <div className="filename">{this.state.filename}</div>
+                        </div>
                     </div>
                     
                 </div>
-            break;
             default:
                 return '_error';
             
@@ -556,13 +715,14 @@ class Profile_table_edit extends Component {
     
       }
     render() {
-        //console.log(this.props)
-        const form_items = this.state.loading?
-            this.props.columns.map((item, key) =>
-            <div className="frm_row" key={key}>
-                {this.renderSwitch(item)}
-            </div>)
-            :'';
+        var form_items='';
+        if(this.state.loading){
+            form_items = 
+                this.props.columns.map((item, key) =>
+                <div className="frm_row" key={key}>
+                    {this.renderSwitch(item)}
+                </div>)
+        }
         
         const caption=this.props.action==2?this.props.params.captionAdd:this.props.params.captionEdit
         const captionButton=this.props.action==2?this.props.params.captionAddButton:this.props.params.captionEditButton

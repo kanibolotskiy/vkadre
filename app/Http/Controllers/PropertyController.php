@@ -22,7 +22,25 @@ use DB;
 
 class PropertyController extends Controller
 {
-    
+    public function fileUpload(Request $request)
+    {
+        print_r($_POST);
+        $name = $request->file('file')->getClientOriginalName();
+        echo "!".$name."!";
+        //echo "!".$request->file."!";
+        //print_r($request->file('file'));
+        $image           = $request->data;
+        /*
+        echo "!".$image."!";
+        $imagename       = time() . $image->getClientOriginalName();
+        $destinationPath = public_path('/images');
+        $uploadValue     = $image->move($destinationPath, $imagename);
+        if ($uploadValue) {
+            return response()->json($imagename);
+        }
+        */
+    }
+
     public function index(){
         $properties["typevacation"]=Property_typevacation::select('id as value','name as label')->orderBy('name','ASC')->get();
         $properties["typecredit"]=Property_typecredit::select('id as value','name as label')->orderBy('name','ASC')->get();
@@ -86,6 +104,7 @@ class PropertyController extends Controller
         return $this->property_models($property)[0]::select('id as value','name as label')->orderBy('name','ASC')->get();
     }
     public function property_update(Request $request,$property){
+        
         $model=$this->property_models($property);
         $data = json_decode($request->getContent(),TRUE);
         foreach($data as $item){

@@ -32,6 +32,10 @@ class Links extends Component {
             }
         }
         this.setAction = this.setAction.bind(this)
+        this.keyFunction = this.keyFunction.bind(this)
+        this._esc = this._esc.bind(this)
+        
+
     }
     setInfo(stateActive){
         this.props.updateData(stateActive,'stateActiveProfile')
@@ -39,6 +43,26 @@ class Links extends Component {
     }
     setAction(stateAction=1){
         this.setState({stateAction:stateAction})
+    }
+    keyFunction(event){
+        if(sessionStorage.getItem("key_action")=="links"){
+            if(event.keyCode === 27) {  
+                this._esc()
+            }
+            if(event.keyCode === 13) {
+                
+            }
+        }
+    }
+    _esc(){
+        this.props.closeInfo()
+    }
+    componentDidMount() {
+        sessionStorage.setItem("key_action", "links")
+        document.addEventListener("keydown", this.keyFunction, false);
+    }
+    componentWillUnmount() {
+        document.removeEventListener("keydown", this.keyFunction, false);
     }
     render() { 
         return (
@@ -50,7 +74,8 @@ class Links extends Component {
                     </div>
                 </div>
                 <Profile_table
-                    customerID={this.props.customerID} 
+                    customerID={this.props.customerData.id}
+                    
                     stateAction={this.state.stateAction} 
                     setAction={this.setAction}
                     url={this.state.item.url}

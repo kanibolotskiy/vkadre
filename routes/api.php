@@ -33,7 +33,7 @@ Route::delete('products/{product}', 'ProductsController@delete');
 
 Route::get('customers', 'CustomersController@index');
 Route::get('customers/{customer}', 'CustomersController@show');
-Route::post('customers','CustomersController@store');
+Route::post('customers','CustomersController@update');
 Route::put('customers/{customer}','CustomersController@update');
 Route::delete('customers/{customer}', 'CustomersController@delete');
 
@@ -106,6 +106,10 @@ Route::get('properties/', 'PropertyController@index');
 Route::get('properties/{property}/', 'PropertyController@property_index');
 Route::post('properties/{property}/','PropertyController@property_update');
 Route::delete('properties/{property}/{property_id}', 'PropertyController@property_delete');
+
+Route::post('test_upload/','PropertyController@fileUpload');
+
+
 
 /*
 Route::delete('properties/martial/{martial}', 'PropertyController@martial_delete');

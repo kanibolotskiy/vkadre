@@ -50,7 +50,7 @@ export default (m_props) => {
   /*Сортировка колонок*/
   const savedCoumnsSort = () => {
     let storageColumnsSort=localStorage.getItem(URL_sorts)
-    let column_sort=[]    
+    let column_sort=[]
     if(storageColumnsSort){
       column_sort=JSON.parse(storageColumnsSort)
     }else{

@@ -25,7 +25,7 @@ class CreateCustomersTable extends Migration
             $table->date('dob')->nullable();
             
             $table->bigInteger('martial_id')->unsigned()->nullable();
-            $table->foreign('martial_id')->references('id')->on('property_martials');
+            $table->foreign('martial_id')->references('id')->on('property_martials')-cascade;
 
             $table->bigInteger('gender_id')->unsigned()->nullable();
             $table->foreign('gender_id')->references('id')->on('property_genders');

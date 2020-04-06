@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { SortingState } from '@devexpress/dx-react-grid';
+import {PagingState,
+  IntegratedPaging, SortingState, SelectionState,IntegratedSelection } from '@devexpress/dx-react-grid';
 import {
   Grid,VirtualTable,
   Table, TableHeaderRow, TableEditRow, TableEditColumn,
@@ -11,35 +12,29 @@ from '@devexpress/dx-react-grid-bootstrap4';
 import Loading from '../elements/Loading.js'
 
 export default (m_props) => {
-  //const URL = m_props.url;
-  /*
+  const URL         = "api/" + m_props.url + "/";
+  const URL_orders  = m_props.url + "_orders";
+  const URL_widths  = m_props.url + "_widths";
+  const URL_sort    = m_props.url + "_sort";
+
+  /**/
   const rowClick = props => {
     const { value } = props;
     return (
-      <Table.Cell {...props} onClick={() =>
-        m_props.clickData(props.row.id)
+      <Table.Row {...props} onClick={() =>
+        console.log(props.row)
+        //m_props.clickData(props.row.id)
       } />
     );
   };
-*/
-  //const [columns] = useState(m_props.columns);
-  //const [tableColumnExtensions] = useState(m_props.columnExt);
-  //const [defaultColumnWidths] = useState(m_props.columnWidth);
-  const [columns] = useState([
-    { name: 'date', title: 'Дата' },
-    { name: 'record', title: 'Запись' },
-    { name: 'base', title: 'Основание' }
-  ]);
-  const [tableColumnExtensions] = useState([
-    { columnName: 'date', align: 'left',width:100},
-    { columnName: 'record', align: 'left',width:200},
-    { columnName: 'base', align: 'left',width:200},
-  ]);
-
+  
+  const [columns] = useState(m_props.columns);
+  const [tableColumnExtensions] = useState(m_props.columns);
+  
   const [rows, setRows] = useState([]); 
 
-  //const [sorting, setSorting] = useState([{ columnName: 'name', direction: 'asc' }]);
-  const [sorting, setSorting] = useState([{ columnName: 'date', direction: 'asc' }])
+  const [sorting, setSorting] = useState([{ columnName: 'date', direction: 'asc' }]);
+  
   const [selection, setSelection] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -47,41 +42,76 @@ export default (m_props) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [lastQuery, setLastQuery] = useState();
-  const [columnOrder, setColumnOrder] = useState([]);
-  const changePageSize = (value) => {
-    const totalPages = Math.ceil(totalCount / value);
-    const updatedCurrentPage = Math.min(currentPage, totalPages - 1);
+  //const [columnOrder, setColumnOrder] = useState([]);
+  //const url = "api/"+this.props.url
+  
 
-    setPageSize(value);
-    setCurrentPage(updatedCurrentPage);
-  };
+  /**Сортировка */
 
-  const getQueryString = () => {
-    let queryString='/api/customer_history/1';
+  /*const savedCoumnsSort = () => {
+    return [{ columnName: 'date', direction: 'desc' }]
+
+    //let storageColumnsOrder=localStorage.getItem(URL_orders)
+    //return storageColumnsOrder?JSON.parse(storageColumnsOrder):m_props.columns_order
+  }*/
+  
+  const savedCoumnsSort = () => {
+    console.log(m_props.columns_sort)
+    return [{ columnName: 'date', direction: 'desc' }]
     /*
-    if (sorting.length) {
-      const sortingConfig = sorting
-        .map(({ columnName, direction }) => ({
-          selector: columnName,
-          desc: direction === 'desc',
-        }));
-      const sortingStr = JSON.stringify(sortingConfig);
-      queryString = `${queryString}`;
-    }
-
-    /*
-    let queryString = `${URL}`+m_props.customerID;
-
-    if (sorting.length) {
-      const sortingConfig = sorting
-        .map(({ columnName, direction }) => ({
-          selector: columnName,
-          desc: direction === 'desc',
-        }));
-      const sortingStr = JSON.stringify(sortingConfig);
-      queryString = `${queryString}`;
-    }
+    let storageColumnsSort=localStorage.getItem(URL_sort)
+    return storageColumnsSort?JSON.parse(storageColumnsSort):m_props.columns_sort
     */
+  /*const onChangeColumnOrder =(value) =>{
+    localStorage.setItem(URL_orders, JSON.stringify(value));
+    */
+  }
+  //const [sorting, setSorting] = useState(savedCoumnsSort)
+  const onChangeSorting = (value) =>{
+    localStorage.setItem(URL_sort, JSON.stringify(value));
+  }
+
+  /**Ширина колонок */
+  const savedCoumnsWidth = () => {
+    let storageColumnsWidth=localStorage.getItem(URL_widths)
+    let column_width=[]    
+    if(storageColumnsWidth){
+      column_width=JSON.parse(storageColumnsWidth)
+    }else{
+      for(let itm in m_props.columns){
+        let elem=m_props.columns[itm]
+        column_width.push({columnName:elem["name"],width:elem["width"]})
+      }
+    }
+    return column_width
+  }
+  const [defaultColumnWidths] = useState(savedCoumnsWidth);
+  const onChangeColumnWidth = (value) =>{
+    localStorage.setItem(URL_widths, JSON.stringify(value));
+  } 
+  /*----------------*/
+  /**Порядок колонок */
+  const savedCoumnsOrder = () => {
+    let storageColumnsOrder=localStorage.getItem(URL_orders)
+    return storageColumnsOrder?JSON.parse(storageColumnsOrder):m_props.columns_order
+  }
+  const [columnsOrder,setColumnsOrder] = useState(savedCoumnsOrder);
+  const onChangeColumnOrder =(value) =>{
+    localStorage.setItem(URL_orders, JSON.stringify(value));
+  }
+  /*----------------*/
+
+  const getQueryString = () => {    
+    let queryString = URL + m_props.customerID+"/";
+    if (sorting.length) {
+      const sortingConfig = sorting
+        .map(({ columnName, direction }) => ({
+          selector: columnName,
+          desc: direction === 'desc',
+        }));
+      const sortingStr = JSON.stringify(sortingConfig);
+      queryString = `${queryString}&sort=${escape(`${sortingStr}`)}`;
+    }
     return queryString;
 
   };
@@ -105,49 +135,26 @@ export default (m_props) => {
   useEffect(() => loadData());
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div className="profile_info_table">
       <Grid
         rows={rows}
         columns={columns}
       >
-        
-        <VirtualTable
-          columnExtensions={tableColumnExtensions}
-        />
-        <SortingState
-          sorting={sorting}
-          onSortingChange={setSorting}
-        />
-        <TableHeaderRow showSortingControls />
+        <PagingState currentPage={currentPage} onCurrentPageChange={setCurrentPage} pageSize={pageSize} />
+        <SelectionState selection={selection} onSelectionChange={setSelection} />
+        <SortingState sorting={sorting} onSortingChange={onChangeSorting} />
+        <DragDropProvider />
+        <IntegratedSelection />
+        <IntegratedPaging />
+        <Table rowComponent={rowClick} />
+        <TableColumnResizing defaultColumnWidths={defaultColumnWidths} onColumnWidthsChange={onChangeColumnWidth}/>
+        <TableHeaderRow showSortingControls/>
+        <TableColumnReordering defaultOrder={columnsOrder} onOrderChange={onChangeColumnOrder}/>
+        <TableSelection showSelectAll />
+        <PagingPanel/>
+        {loading && <Loading />}
       </Grid>
-     
-      
+
     </div>
   );
 };
-
-/*
-<Grid rows={rows} columns={columns}>
-        <SelectionState
-          selection={selection}
-          onSelectionChange={setSelection}
-        />
-        <SortingState
-          sorting={sorting}
-          onSortingChange={setSorting}
-        />
-        <DragDropProvider />
-        <IntegratedSelection />
-        <VirtualTable columnExtensions={tableColumnExtensions} cellComponent={rowClick}/>
-        <TableColumnResizing defaultColumnWidths={defaultColumnWidths} />
-        <IntegratedSorting />
-        <TableHeaderRow showSortingControls/>
-        
-        <TableSelection showSelectAll rowComponent={rowClick}/>
-        <TableColumnReordering
-          defaultOrder={['date','record', 'base']}
-         
-        />
-        {loading && <Loading />}
-      </Grid>
-       */

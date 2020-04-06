@@ -28,6 +28,10 @@ class Visit extends Component {
             }
         }
         this.setAction = this.setAction.bind(this)
+        this.keyFunction = this.keyFunction.bind(this)
+        this._esc = this._esc.bind(this)
+        
+
     }
     setInfo(stateActive){
         this.props.updateData(stateActive,'stateActiveProfile')
@@ -36,11 +40,31 @@ class Visit extends Component {
     setAction(stateAction=1){
         this.setState({stateAction:stateAction})
     }
+    keyFunction(event){
+        if(sessionStorage.getItem("key_action")=="visit"){
+            if(event.keyCode === 27) {  
+                this._esc()
+            }
+            if(event.keyCode === 13) {
+                
+            }
+        }
+    }
+    _esc(){
+        this.props.closeInfo()
+    }
+    componentDidMount() {
+        sessionStorage.setItem("key_action", "visit")
+        document.addEventListener("keydown", this.keyFunction, false);
+    }
+    componentWillUnmount() {
+        document.removeEventListener("keydown", this.keyFunction, false);
+    }
     render() { 
         return (
             <div>
                 <Profile_table
-                    customerID={this.props.customerID} 
+                    customerID={this.props.customerData.id}
                     stateAction={this.state.stateAction} 
                     setAction={this.setAction}
                     url={this.state.item.url}

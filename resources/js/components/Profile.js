@@ -100,7 +100,7 @@ class Profile extends Component {
         this.setAction = this.setAction.bind(this)
         this.addNew = this.addNew.bind(this)
         this.closeInfo = this.closeInfo.bind(this)
-        
+        this.updateTable = this.updateTable.bind(this)
 
     }
     /*
@@ -108,11 +108,11 @@ class Profile extends Component {
         sessionStorage.setItem("key_action", "profile_base")
         document.addEventListener("keydown", this.keyFunction, false);
     }*/
-    /*
+    /**/
     componentWillUnmount(){
         document.removeEventListener("keydown", this.keyFunction, false);
     }
-    */
+    
     keyFunction(event){
         if(sessionStorage.getItem("key_action")=="profile"){
             if(event.keyCode === 27) {
@@ -138,6 +138,10 @@ class Profile extends Component {
     closeInfo(){
         this.props.closeInfo()
     }
+    updateTable(){
+        this.props.updateTable()
+    }
+
     render() { 
 
         const tab_blocks_header = []    //Вкладки профиля
@@ -154,7 +158,7 @@ class Profile extends Component {
             block_tables.push(
                 this.props.selected==item.selected? 
                     <Profile_table key={index}
-                        customerID={this.props.customerID} 
+                        customerID={this.props.customerData.id} 
                         stateAction={this.state.stateAction} 
                         setAction={this.setAction}
                         closeInfo={this.closeInfo}
@@ -162,6 +166,7 @@ class Profile extends Component {
                         columns={item.columns}
                         sortOrder={item.sortOrder}
                         params={item.params}
+                        
                     />:''
             )
         }
@@ -178,7 +183,13 @@ class Profile extends Component {
                         <div className="btn">Печать</div>
                     </div>
                 </div>
-                {this.props.selected==1? <Profile_base closeInfo={this.closeInfo} customerID={this.props.customerID} />:''}
+                {this.props.selected==1? 
+                    <Profile_base 
+                        updateTable={this.updateTable}
+                        closeInfo={this.closeInfo} 
+                        //customerID={this.props.customerID} 
+                        customerData={this.props.customerData}
+                    />:''}
                 {block_tables}
             </div>
         )
