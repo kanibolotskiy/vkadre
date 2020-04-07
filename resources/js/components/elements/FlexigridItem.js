@@ -8,7 +8,7 @@ import {
   Table, TableHeaderRow, TableEditRow, TableEditColumn,
   PagingPanel, DragDropProvider, TableColumnReordering,
   TableFixedColumns, TableSummaryRow,TableColumnResizing,TableSelection,
-  ColumnChooser,TableColumnVisibility,Toolbar,
+  ColumnChooser,TableColumnVisibility,Toolbar
 } //from '@devexpress/dx-react-grid-bootstrap3';
 from '@devexpress/dx-react-grid-bootstrap4';
 import Loading from '../elements/Loading.js'
@@ -201,6 +201,7 @@ if(m_props.updateTableFlag){
   const [lastQuery, setLastQuery] = useState();
   const [columnOrder, setColumnOrder] = useState([]);
   const noDataMsg = !loading ? { noData: "Нет данных" } : { noData: "Загрузка..." }
+  const pagingMsg = {info:"{from}-{to} из {count}"}
   /*
   const changePageSize = (value) => {
     const totalPages = Math.ceil(totalCount / value);
@@ -211,6 +212,7 @@ if(m_props.updateTableFlag){
   */
 
   const getQueryString = () => {    
+    
     let queryString = "api/"+URL ;
     if (sorting.length) {
       const sortingConfig = sorting
@@ -320,6 +322,7 @@ const ChooserButton = ({item, disabled,onToggle}) => (
         >
           <SelectionState selection={selection} onSelectionChange={setSelection} />
           <SortingState defaultSorting={[{ columnName: 'id', direction: 'asc' }]} />
+          <PagingState currentPage={currentPage} onCurrentPageChange={setCurrentPage} pageSize={pageSize} />
           <DragDropProvider />
           <IntegratedSelection />
           <Table rowComponent={rowClick}  messages={noDataMsg}/>
@@ -341,6 +344,7 @@ const ChooserButton = ({item, disabled,onToggle}) => (
           <CurrencyTypeProvider for={currencyColumns}/>
           <TableSelection showSelectAll rowComponent={rowClick}/>
           <TableColumnReordering defaultOrder={columnsOrder} onOrderChange={onChangeColumnOrder}/>
+          <PagingPanel messages={pagingMsg}/>
           {loading && <Loading />}
 
         </Grid>

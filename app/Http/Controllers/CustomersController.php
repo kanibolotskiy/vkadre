@@ -121,10 +121,12 @@ class CustomersController extends Controller
 
         $file=$request->file('file');//->getClientOriginalName();
         if($file){
-            $filename       = $file->getClientOriginalName();
-            $destinationPath = public_path('/uploads/photo/'.$customer->id."/");
-            $uploadValue     = $file->move($destinationPath, $filename);
-            $customer->photo=addslashes('/uploads/photo/'.$customer->id."/".$filename);
+            $filename           = $file->getClientOriginalName();
+            $destinationFolder  = '/uploads/photo/'.$customer->id."/";
+            $destinationPath    = public_path($destinationFolder);
+
+            $uploadValue        = $file->move($destinationPath, $filename);
+            $customer->photo    = $destinationFolder.$filename;
             //DB::insert('insert into files (polygraf_id,file_path,file_name) values (?,?,?)',[$polygraf->id,$destinationPath,$filename]);  
         }
 

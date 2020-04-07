@@ -285,19 +285,7 @@ class Profile_table_edit extends Component {
     addRecord(){
         console.log(this.props)
         if(this.addRecord_validate()){
-            let url_update='';
-            let method='';
-            if(this.props.action==2){   //Добавить новый
-                url_update='api/'+this.props.url;
-                method="post";
-                var data = new FormData()
-            }else{                      //Обновить
-                url_update='api/'+this.props.url+"/"+this.props.rowData.id
-                method="POST";
-                
-                var data = new FormData()
-                data.append('_method', 'PUT')
-            }
+            
             
             /**--------------------------
             let uploadImage =  event.target.file;
@@ -317,7 +305,19 @@ class Profile_table_edit extends Component {
             })
             /**--------------------------*/
 
-            
+            let url_update='';
+            let method='';
+            if(this.props.action==2){   //Добавить новый
+                url_update='api/'+this.props.url;
+                method="post";
+                var data = new FormData()
+            }else{                      //Обновить
+                url_update='api/'+this.props.url+"/"+this.props.rowData.id
+                method="POST";
+                
+                var data = new FormData()
+                data.append('_method', 'PUT')
+            }
             
             Object.keys(this.state.newRecord).map((item) => 
                 //console.log(item+"="+this.state.newRecord[item])
