@@ -215,7 +215,7 @@ class Profile_base extends Component {
         if(this.props.customerID==undefined){   //Добавить новый
             //url_update='api/'+this.props.url;
             console.log("добавить новый")
-            var fetch_url='/api/customers_add/'
+            var fetch_url='/api/customers_add'
             
             method="POST";
             var data = new FormData()
