@@ -243,7 +243,7 @@ class Profile_base extends Component {
         if(input){
             data.append('file', input.files[0])
         }
-
+        console.log("method="+method)
         fetch(fetch_url, {
             method:method,
             body: data
