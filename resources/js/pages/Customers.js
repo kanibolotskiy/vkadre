@@ -48,7 +48,7 @@ class Customers extends Component {
     componentDidMount(){
         sessionStorage.setItem("key_action", "customers")
         document.addEventListener("keydown", this.keyFunction, false);
-        document.addEventListener("keyup", this.keyFunctionUp, false);
+        //document.addEventListener("keyup", this.keyFunctionUp, false);
     }
     
     componentWillUnmount(){
@@ -188,7 +188,7 @@ class Customers extends Component {
                         {this.state.stateActive==1 && this.state.showInfo? 
                             <Profile 
                                 closeInfo={this.closeInfo} 
-                                ///customerID={this.state.customerID} 
+                                //customerID={this.state.customerID} 
                                 customerData={this.state.customerData}
                                 selected={this.state.stateSelected.stateActiveProfile} 
                                 updateData = {this.updateData}

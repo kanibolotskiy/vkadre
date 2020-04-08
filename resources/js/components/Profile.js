@@ -187,7 +187,7 @@ class Profile extends Component {
                     <Profile_base 
                         updateTable={this.updateTable}
                         closeInfo={this.closeInfo} 
-                        //customerID={this.props.customerID} 
+                        customerID={this.props.customerData.id} 
                         customerData={this.props.customerData}
                     />:''}
                 {block_tables}

@@ -211,8 +211,8 @@ class Profile_base extends Component {
     _enter(){
         let url_update='';
         let method='';
-        
-        if(this.props.action==2){   //Добавить новый
+        console.log(this.props)
+        if(this.props.customerID==undefined){   //Добавить новый
             //url_update='api/'+this.props.url;
             var fetch_url='/api/customers/'
             
