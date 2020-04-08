@@ -211,10 +211,11 @@ class Profile_base extends Component {
     _enter(){
         let url_update='';
         let method='';
-        console.log(this.props)
+        
         if(this.props.customerID==undefined){   //Добавить новый
             //url_update='api/'+this.props.url;
-            var fetch_url='/api/customers/'
+            console.log("добавить новый")
+            var fetch_url='/api/customers_add/'
             
             method="post";
             var data = new FormData()

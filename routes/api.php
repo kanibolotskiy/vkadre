@@ -17,23 +17,23 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-/**
+/*
 **Basic Routes for a RESTful service:
 **Route::get($uri, $callback);
 **Route::post($uri, $callback);
 **Route::put($uri, $callback);
 **Route::delete($uri, $callback);
-**
-*/
 Route::get('products', 'ProductsController@index');
 Route::get('products/{product}', 'ProductsController@show');
 Route::post('products','ProductsController@store');
 Route::put('products/{product}','ProductsController@update');
 Route::delete('products/{product}', 'ProductsController@delete');
+*/
+
 
 Route::get('customers/{filter}/{params?}', 'CustomersController@index');
-Route::get('customers/{customer}', 'CustomersController@show');
-Route::post('customers','CustomersController@update');
+//Route::get('customers/{customer}', 'CustomersController@show');
+Route::post('customers_add','CustomersController@update');
 Route::put('customers/{customer}','CustomersController@update');
 Route::delete('customers/{customer}', 'CustomersController@delete');
 
