@@ -151,18 +151,21 @@ class CustomersController extends Controller
             $customer=new Customer;
         }
 
-        $file=$request->file('file');//->getClientOriginalName();
-        if($file){
-            $filename           = $file->getClientOriginalName();
-            $destinationFolder  = '/uploads/photo/'.$customer->id."/";
-            $destinationPath    = public_path($destinationFolder);
+        if($request->get('photo')){   
+            $file=$request->file('file');//->getClientOriginalName();
+            if($file){
+                $filename           = $file->getClientOriginalName();
+                $destinationFolder  = '/uploads/photo/'.$customer->id."/";
+                $destinationPath    = public_path($destinationFolder);
 
-            $uploadValue        = $file->move($destinationPath, $filename);
-            $customer->photo    = $destinationFolder.$filename;
-            //echo $destinationFolder.$filename;
-            //DB::insert('insert into files (polygraf_id,file_path,file_name) values (?,?,?)',[$polygraf->id,$destinationPath,$filename]);  
+                $uploadValue        = $file->move($destinationPath, $filename);
+                $customer->photo    = $destinationFolder.$filename;
+                //echo $destinationFolder.$filename;
+                //DB::insert('insert into files (polygraf_id,file_path,file_name) values (?,?,?)',[$polygraf->id,$destinationPath,$filename]);  
+            }
+        }else{
+            $customer->photo=$request->get('photo');
         }
-
         /**Семейный статус */
         $martial_item=$request->get('martial_name');
         if($martial_item){
