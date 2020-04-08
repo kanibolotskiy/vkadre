@@ -62,16 +62,18 @@ class CustomersController extends Controller
 
         parse_str($filter, $output_filter);
         //print_r($output_filter["filter"]);
-        $filter_arr=json_decode($output_filter["filter"],TRUE);
+        //$filter_arr=json_decode($output_filter["filter"],TRUE);
         //print_r($filter_arr);
         //echo "*".$filter_arr["searchName"]."*";
         //$searchByName=trim($output_filter["searchName"]);
         //echo "*".html_entity_decode(preg_replace("/U\+([0-9A-F]{4})/", "&#x\\1;", $searchByName), ENT_NOQUOTES, 'UTF-8')."*";
-        $searchByName=$filter_arr["searchName"];
+        //$searchByName=$filter_arr["searchName"];
         //print_r($output_filter);
         //echo "!".html_entity_decode  ($searchByName)."!";
-
         //$searchByName='';
+
+        //print_r($output_filter);
+        $searchName=$output_filter["searchName"];
 
         $query = Customer::
         leftjoin('property_martials as pm', 'pm.id', '=', 'customers.martial_id')
@@ -99,8 +101,8 @@ class CustomersController extends Controller
             '))
         ->orderBy($sorting_rule["selector"], $sorting_rule["order"]);
         
-        if($searchByName){
-            $query->where(DB::raw('CONCAT(IF(customers.surname IS NULL,"",customers.surname)," ",IF(customers.name IS NULL,"",customers.name)," ",IF(customers.patronymic IS NULL,"",customers.patronymic))'), 'LIKE', "%".$searchByName."%");
+        if($searchName){
+            $query->where(DB::raw('CONCAT(IF(customers.surname IS NULL,"",customers.surname)," ",IF(customers.name IS NULL,"",customers.name)," ",IF(customers.patronymic IS NULL,"",customers.patronymic))'), 'LIKE', "%".$searchName."%");
             
             //$query->where('customers.surname','like','%'.urldecode ($searchByName).'%');
         }

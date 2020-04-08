@@ -226,12 +226,16 @@ if(m_props.updateTableFlag){
       const sortingStr = JSON.stringify(sortingConfig);
       localStorage.setItem(URL_sorts, sortingStr);
       //queryString = `${queryString}&sort=${escape(`${sortingStr}`)}`;
+      /*
       const filterParam={
         searchName:m_props.searchName
       }
-      var filterParamUrl=JSON.stringify(filterParam);
-
-      queryString = `${queryString}&filter=${filterParamUrl}/&sort=${escape(`${sortingStr}`)}&take=${pageSize}&page=${currentPage}`;
+      */
+      //var filterParamUrl=JSON.stringify(filterParam);
+      //console.log(filterParam)
+      //console.log(filterParamUrl)
+      
+      queryString = `${queryString}&searchName=${m_props.searchName}/&sort=${escape(`${sortingStr}`)}&take=${pageSize}&page=${currentPage}`;
       
 
     }
@@ -242,6 +246,7 @@ if(m_props.updateTableFlag){
     const queryString = getQueryString_main();
     if (queryString !== lastQuery && !loading) {
       setLoading(true);
+      console.log("url="+queryString)
       fetch(queryString, {  
           method:"GET"
         })
