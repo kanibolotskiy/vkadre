@@ -242,11 +242,7 @@ if(m_props.updateTableFlag){
     const queryString = getQueryString_main();
     if (queryString !== lastQuery && !loading) {
       setLoading(true);
-      fetch(queryString, {  
-          headers: {  
-            "Content-type": "text/html; charset=UTF-8"  
-          }
-        })
+      fetch(queryString)
         .then(response => response.json())
         .then((data)=>{
           //console.log(data["total"])
