@@ -52,10 +52,28 @@ class CustomersController extends Controller
         return $out;
     }
    
-    public function index()
+    public function index($filter,$params=null)
     {
+        parse_str($params, $output);
+        $sorting_rule=$this->sortUrl($output,"properties");
+        
+        $take=$output["take"];
+        $page=$output["page"];
 
-        return Customer::
+        parse_str($filter, $output_filter);
+        //print_r($output_filter["filter"]);
+        $filter_arr=json_decode($output_filter["filter"],TRUE);
+        //print_r($filter_arr);
+        //echo "*".$filter_arr["searchName"]."*";
+        //$searchByName=trim($output_filter["searchName"]);
+        //echo "*".html_entity_decode(preg_replace("/U\+([0-9A-F]{4})/", "&#x\\1;", $searchByName), ENT_NOQUOTES, 'UTF-8')."*";
+        $searchByName=$filter_arr["searchName"];
+        //print_r($output_filter);
+        //echo "!".html_entity_decode  ($searchByName)."!";
+
+        //$searchByName='';
+
+        $query = Customer::
         leftjoin('property_martials as pm', 'pm.id', '=', 'customers.martial_id')
         ->leftjoin('property_genders as pg', 'pg.id', '=', 'customers.gender_id')
         ->leftjoin('property_subdivisions as ps', 'ps.id', '=', 'customers.subdivision_id')
@@ -79,8 +97,17 @@ class CustomersController extends Controller
             DB::raw('CONCAT(IF(customers.surname IS NULL,"",customers.surname)," ",IF(customers.name IS NULL,"",customers.name)," ",IF(customers.patronymic IS NULL,"",customers.patronymic)) as fullname,
             CONCAT(IF(cur.surname IS NULL,"",cur.surname)," ",IF(cur.name IS NULL,"",cur.name)," ",IF(cur.patronymic IS NULL,"",cur.patronymic)) as curator
             '))
-        ->get();
+        ->orderBy($sorting_rule["selector"], $sorting_rule["order"]);
+        
+        if($searchByName){
+            $query->where(DB::raw('CONCAT(IF(customers.surname IS NULL,"",customers.surname)," ",IF(customers.name IS NULL,"",customers.name)," ",IF(customers.patronymic IS NULL,"",customers.patronymic))'), 'LIKE', "%".$searchByName."%");
+            
+            //$query->where('customers.surname','like','%'.urldecode ($searchByName).'%');
+        }
+
+        return $query->paginate($take, ['*'], 'page', $page+1);
     }
+
     //DATE_FORMAT(customers.dob,"%d.%m.%Y")
     //'IFNULL("",cusromers.dob) as dob',
     public function customers_select(Request $request){
@@ -88,9 +115,12 @@ class CustomersController extends Controller
         if($searchParam){
             return Customer::select('customers.id as value', 
             DB::raw('CONCAT(IF(customers.surname IS NULL,"",customers.surname)," ",IF(customers.name IS NULL,"",customers.name)," ",IF(customers.patronymic IS NULL,"",customers.patronymic)) as label'))
-            ->where('customers.name','like','%'.$searchParam.'%')
-            ->orWhere('customers.surname','like','%'.$searchParam.'%')
-            ->orWhere('customers.patronymic','like','%'.$searchParam.'%')
+            //->whereRaw('CONCAT(IF(customers.surname IS NULL,"",customers.surname)," ",IF(customers.name IS NULL,"",customers.name)," ",IF(customers.patronymic IS NULL,"",customers.patronymic))', ['%'.$searchParam.'%'])
+            //->where('customers.patronymic','like','%'.$searchParam.'%')
+            //->whereRaw('CONCAT(IF(customers.surname IS NULL,"",customers.surname)," ",IF(customers.name IS NULL,"",customers.name)," ",IF(customers.patronymic IS NULL,"",customers.patronymic))', '%иван%')
+            ->where(DB::raw('CONCAT(IF(customers.surname IS NULL,"",customers.surname)," ",IF(customers.name IS NULL,"",customers.name)," ",IF(customers.patronymic IS NULL,"",customers.patronymic))'), 'LIKE', "%".$searchParam."%")
+
+            //->orWhere('customers.patronymic','like','%'.$searchParam.'%')
             ->limit(10)
             ->get();
         }
@@ -127,6 +157,7 @@ class CustomersController extends Controller
 
             $uploadValue        = $file->move($destinationPath, $filename);
             $customer->photo    = $destinationFolder.$filename;
+            echo $destinationFolder.$filename;
             //DB::insert('insert into files (polygraf_id,file_path,file_name) values (?,?,?)',[$polygraf->id,$destinationPath,$filename]);  
         }
 

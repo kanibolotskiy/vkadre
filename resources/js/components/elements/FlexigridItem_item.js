@@ -157,29 +157,15 @@ export default (m_props) => {
           columnName: columnName,
           direction: direction,
         }));
-      /*
-        .map(({ columnName, direction }) => ({
-          selector: columnName,
-          order: direction,
-        }));
-      */
-
-        //console.log(sortingConfig)
-      //const [sorting, setSorting] = useState([{ columnName: 'name', direction: 'asc' }]);
-      //[{"selector":"record","order":"asc"}]
-      //let sort_arr=[{columnName:sortingConfig["selector"],direction:sortingConfig["order"]}]
-      //console.log(sort_arr)
-      localStorage.setItem(URL_sorts, JSON.stringify(sortingConfig));
-
       const sortingStr = JSON.stringify(sortingConfig);
-      //console.log(sortingStr)
+      localStorage.setItem(URL_sorts, sortingStr);
       queryString = `${queryString}&sort=${escape(`${sortingStr}`)}`;
     }
     return queryString;
-
   };
   
   const loadData = () => {
+    
     const queryString = getQueryString();
     if (queryString !== lastQuery && !loading) {
       setLoading(true);

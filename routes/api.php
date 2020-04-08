@@ -31,7 +31,7 @@ Route::post('products','ProductsController@store');
 Route::put('products/{product}','ProductsController@update');
 Route::delete('products/{product}', 'ProductsController@delete');
 
-Route::get('customers', 'CustomersController@index');
+Route::get('customers/{filter}/{params?}', 'CustomersController@index');
 Route::get('customers/{customer}', 'CustomersController@show');
 Route::post('customers','CustomersController@update');
 Route::put('customers/{customer}','CustomersController@update');

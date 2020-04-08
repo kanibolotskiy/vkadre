@@ -141,7 +141,7 @@ class Profile_base extends Component {
             
             //this.setState({newRecord:this.props.customerData})
             //this.setState({oldRecord:this.props.customerData})
-            this.setState({customerID:this.props.customerData.id})            
+            this.setState({customerID:this.props.customerData.id})
             this.setTableData(this.props.customerData)
 
         }
@@ -157,9 +157,10 @@ class Profile_base extends Component {
         //this.setState({newRecord:this.props.customerData})
         //this.setState({oldRecord:this.props.customerData})
         //this.setState({data:this.props.customerData})
-        //this.setState({customerID:this.props.customerData.id})
+        
         sessionStorage.setItem("key_action", "profile_base")
         document.addEventListener("keydown", this.keyFunction, false);
+        this.setState({customerID:this.props.customerData.id})
         this.setTableData(this.props.customerData)
         
         //this.setState({loading:false})
@@ -498,9 +499,7 @@ class Profile_base extends Component {
                 photo:tmppath,
             }
         })
-
         console.log(input.files[0].name)
-    
     }
 
     
@@ -549,8 +548,8 @@ class Profile_base extends Component {
                     <div className="col">
                         
                         <div className={"profilePhoto "+(this.state.zoom?'active':'')} 
-onClick={()=>this.zoomPhoto(true)}
-style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>                            
+onClick={()=>this.zoomPhoto(true)} 
+style={{backgroundImage:this.state.newRecord.photo?`url(${this.state.newRecord.photo})`:``}}>                            
                         </div>
                         {this.state.zoom?
                             <div onClick={()=>this.zoomPhoto(false)} className="profilePhoto_close">X</div>
@@ -558,7 +557,7 @@ style={{backgroundImage:`url(${this.state.newRecord.photo})`}}>
                         <div className="profilePhoto_captions">
 <div className="profilePhoto_add">
     <input accept="image/*" className="inputfile" type="file" name="file" id="file" onChange={this.handleChangeFile} ref={ref => this.fileInput = ref}/>
-    <label for="file">{this.state.newRecord.photo?'Изменить фото':'Добавить фото'}</label>
+    <label htmlFor="file">{this.state.newRecord.photo?'Изменить фото':'Добавить фото'}</label>
 
 </div>
 

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
   SortingState, EditingState, PagingState, SummaryState, DataTypeProvider, CurrencyTypeProvider,
-  IntegratedPaging, IntegratedSorting, IntegratedSummary, SelectionState,IntegratedSelection
+  IntegratedPaging, IntegratedSorting, IntegratedSummary, SelectionState,IntegratedSelection,
+  CustomPaging
 } from '@devexpress/dx-react-grid';
 import {
   Grid,
@@ -18,6 +19,7 @@ export default (m_props) => {
   const URL = m_props.url;
   const URL_widths = m_props.url+"_width"
   const URL_orders = m_props.url+"_order"
+  const URL_sorts = m_props.url+"_sort"
   const URL_hides = m_props.url+"_hide"
 
   
@@ -190,11 +192,11 @@ if(m_props.updateTableFlag){
 
 
   //const [sorting, setSorting] = useState([{ columnName: 'name', direction: 'asc' }]);
-  const [sorting, getSorting] = useState([]);
+  //const [sorting, getSorting] = useState([]);
   const [selection, setSelection] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
-  const [pageSizes] = useState([5, 10, 15]);
+  const [pageSize, setPageSize] = useState(20);
+  //const [pageSizes] = useState([5, 10, 15]);
   const [currentPage, setCurrentPage] = useState(0);
 
 
@@ -211,30 +213,45 @@ if(m_props.updateTableFlag){
   };
   */
 
-  const getQueryString = () => {    
+  const getQueryString_main = () => {    
     
-    let queryString = "api/"+URL ;
+    let queryString = "api/"+URL+"/" ;
+    //console.log(queryString)
     if (sorting.length) {
       const sortingConfig = sorting
         .map(({ columnName, direction }) => ({
-          selector: columnName,
-          order: direction,
+          columnName: columnName,
+          direction: direction,
         }));
       const sortingStr = JSON.stringify(sortingConfig);
-      console.log(sortingStr)
-      queryString = `${queryString}&sort=${escape(`${sortingStr}`)}`;
+      localStorage.setItem(URL_sorts, sortingStr);
+      //queryString = `${queryString}&sort=${escape(`${sortingStr}`)}`;
+      const filterParam={
+        searchName:m_props.searchName
+      }
+      var filterParamUrl=JSON.stringify(filterParam);
+
+      queryString = `${queryString}&filter=${filterParamUrl}/&sort=${escape(`${sortingStr}`)}&take=${pageSize}&page=${currentPage}`;
+      
+
     }
     return queryString;
   };
   
-  const loadData = () => {
-    const queryString = getQueryString();
+  const loadData_main = () => {
+    const queryString = getQueryString_main();
     if (queryString !== lastQuery && !loading) {
       setLoading(true);
-      fetch(queryString)
+      fetch(queryString, {  
+          headers: {  
+            "Content-type": "text/html; charset=UTF-8"  
+          }
+        })
         .then(response => response.json())
         .then((data)=>{
-          setRows(data);
+          //console.log(data["total"])
+          setRows(data["data"]);
+          setTotalCount(data["total"]);
           setLoading(false);
         })
         .catch(() => setLoading(false));
@@ -242,7 +259,7 @@ if(m_props.updateTableFlag){
     }
   };
   
-  useEffect(() => loadData());
+  useEffect(() => loadData_main());
 
 
 /*Показывать колонки */
@@ -265,6 +282,25 @@ const savedCoumnsHide = () => {
 //const [columnsOrder,setColumnsOrder] = useState(savedCoumnsOrder);
 const [hiddenColumnNames,setHiddenColumnNames] = useState(savedCoumnsHide);
 
+/*Сортировка колонок*/
+const savedCoumnsSort = () => {
+  
+  let storageColumnsSort=localStorage.getItem(URL_sorts)
+  console.log(storageColumnsSort)
+  
+  let column_sort=[]
+  if(storageColumnsSort){
+    column_sort=JSON.parse(storageColumnsSort)
+  }else{
+    for(let itm in m_props.columns){
+      let elem=m_props.columns[itm]
+      //column_sort.push({columnName:elem["columnName"],sort:elem["order"]})
+    }
+  }
+  return column_sort
+}
+const [sorting, setSorting] = useState(savedCoumnsSort);
+
 /*
 const setHiddenColumnNames = (column) =>{
   return column
@@ -283,7 +319,7 @@ const onToggle=(event)=>{
 }
 */
 const onToggles=(item,func)=>{
-  console.log(item)
+  //console.log(item)
 
   let stored_column_hide=[]
   //let saved_column_hide=JSON.parse(localStorage.getItem(URL_hides))
@@ -321,7 +357,7 @@ const ChooserButton = ({item, disabled,onToggle}) => (
           columns={columns}
         >
           <SelectionState selection={selection} onSelectionChange={setSelection} />
-          <SortingState defaultSorting={[{ columnName: 'id', direction: 'asc' }]} />
+          <SortingState sorting={sorting} onSortingChange={setSorting} />
           <PagingState currentPage={currentPage} onCurrentPageChange={setCurrentPage} pageSize={pageSize} />
           <DragDropProvider />
           <IntegratedSelection />
@@ -329,15 +365,8 @@ const ChooserButton = ({item, disabled,onToggle}) => (
           <TableColumnResizing defaultColumnWidths={defaultColumnWidths} onColumnWidthsChange={onChangeColumnWidth} />
           <IntegratedSorting />
           <TableHeaderRow showSortingControls/>
-          <TableColumnVisibility
-            hiddenColumnNames={hiddenColumnNames}
-            onHiddenColumnNamesChange={setHiddenColumnNames}
-            //defaultHiddenColumnNames={storeHiddenColumnNames}
-
-            //hiddenColumnNames={hiddenColumnNames}
-            //hiddenColumnNames={["gender"]}
-            //onHiddenColumnNamesChange={setHiddenColumnNames}
-          />
+          <TableColumnVisibility hiddenColumnNames={hiddenColumnNames} onHiddenColumnNamesChange={setHiddenColumnNames}/>
+          
           <Toolbar />
           <ColumnChooser itemComponent={ChooserButton} />
           <DateTypeProvider for={dateColumns}/>
@@ -345,6 +374,11 @@ const ChooserButton = ({item, disabled,onToggle}) => (
           <TableSelection showSelectAll rowComponent={rowClick}/>
           <TableColumnReordering defaultOrder={columnsOrder} onOrderChange={onChangeColumnOrder}/>
           <PagingPanel messages={pagingMsg}/>
+
+          <CustomPaging
+            totalCount={totalCount}
+          />
+
           {loading && <Loading />}
 
         </Grid>

@@ -55,38 +55,7 @@ class Dictionary extends Component {
                 this.setState({oldRecord:JSON.stringify(data)})
                 this.setState({newRecord:data})
             })
-            /*
-            .then(response => {
-                let newRecord=this.state.newRecord
-
-                
-                newRecord.splice(this.state.deleteKey, 1); 
-                
-                this.setState({newRecord:newRecord})
-                //this.setState({deleteId:0})
-                this.setState({deleteKey:-1})
-
-                
-
-                //this.props.setAction(1)
-                //this.setState({"showConfirm":false})
-            })
-            */
-
-            //console.log("del="+this.state.deleteId)
-            /*
-            fetch('api/'+this.props.url+"/"+this.props.rowData.id, {
-                method:'delete',
-                headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-                }
-            })
-            .then(response => {
-                this.props.setAction(1)
-                this.setState({"showConfirm":false})
-            })
-            */
+           
         }else{
             //this.setState({"showConfirm":false})
             //this.showConfirm(false)
@@ -227,7 +196,7 @@ class Dictionary extends Component {
                             <div className="btn btn_esc" onClick={this._esc}>
                                 {data_changed?'Выход':'Отменить'} (Esc)
                             </div>
-                            <div className={"btn btn_enter "+(data_changed?'unactive':'')} onClick={this._savea}>Сохранить (Enter)</div>
+                            <div className={"btn btn_enter "+(data_changed?'unactive':'')} onClick={this._save}>Сохранить (Enter)</div>
                         </div>
                     </div>
                 </div>
