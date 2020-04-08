@@ -295,10 +295,15 @@ const savedCoumnsSort = () => {
   if(storageColumnsSort){
     column_sort=JSON.parse(storageColumnsSort)
   }else{
+    //column_sort={columnName:"ID",sort:"ASC"}
+    /*
     for(let itm in m_props.columns){
       let elem=m_props.columns[itm]
       //column_sort.push({columnName:elem["columnName"],sort:elem["order"]})
     }
+    */
+   column_sort=[{columnName:"id",direction:"asc"}]
+
   }
   return column_sort
 }
